@@ -39,7 +39,7 @@ export async function updateSession(request: NextRequest) {
   const path = request.nextUrl.pathname
   const isStudentPublicProfile = /^\/student\/[^/]+$/.test(path) && path !== '/student/dashboard'
   
-  const isPublicRoute = path.startsWith('/public') || path === '/' || path.startsWith('/api') || path === '/about' || isStudentPublicProfile
+  const isPublicRoute = path.startsWith('/public') || path === '/' || path.startsWith('/api') || path === '/about' || isStudentPublicProfile || path.startsWith('/auth')
   const isAuthRoute = path.startsWith('/login') || path.startsWith('/signup')
 
   if (!user && !isPublicRoute && !isAuthRoute) {
