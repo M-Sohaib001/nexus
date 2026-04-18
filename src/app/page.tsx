@@ -34,7 +34,7 @@ export default async function Home() {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
           <Link href="/login" className="w-full sm:w-auto">
-            <Button size="lg" className="w-full sm:w-64 h-14 text-xs font-black uppercase tracking-[0.2em] shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+            <Button size="lg" className="w-full sm:w-64 h-14 text-xs font-black uppercase tracking-[0.2em] shadow-[0_0_30px_rgba(239,68,68,0.2)]">
               INITIALIZE_SESSION
             </Button>
           </Link>
