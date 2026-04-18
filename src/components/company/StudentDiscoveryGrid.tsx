@@ -56,7 +56,7 @@ export function StudentDiscoveryGrid({
 
   return (
     <div className="space-y-6 pb-20">
-      <Card className="p-4 md:p-6 rounded-none border-primary/20 sticky top-4 z-40 bg-background/95 backdrop-blur-md shadow-[0_0_20px_rgba(59,130,246,0.05)]">
+      <Card className="p-4 md:p-6 rounded-none border-primary/20 sticky top-4 z-40 bg-background/95 backdrop-blur-md shadow-[0_0_20px_rgba(239,68,68,0.05)]">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
           <div className="space-y-2">
             <Label className="system-label text-primary/70">PARAM: GRAD_YEAR</Label>
@@ -142,7 +142,7 @@ export function StudentDiscoveryGrid({
 
                     {student.availability === 'actively_looking' && (
                       <div className="mb-6">
-                        <span className="bg-primary/10 text-primary border border-primary/30 px-3 py-1 rounded-none text-[9px] font-black uppercase tracking-[0.2em] shadow-[0_0_15px_rgba(59,130,246,0.1)]">
+                        <span className="bg-primary/10 text-primary border border-primary/30 px-3 py-1 rounded-none text-[9px] font-black uppercase tracking-[0.2em] shadow-[0_0_15px_rgba(239,68,68,0.1)]">
                           STATUS: ACTIVE_LOOKING
                         </span>
                       </div>

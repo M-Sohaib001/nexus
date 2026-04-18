@@ -15,7 +15,7 @@ const TAG_CONFIG: Record<string, { label: string; classes: string }> = {
   },
   follow_up: {
     label: 'FOLLOW_UP',
-    classes: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/50',
+    classes: 'bg-red-500/20 text-red-400 border-red-500/50',
   },
   not_now: {
     label: 'NOT_NOW',

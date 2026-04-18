@@ -62,7 +62,7 @@ export default async function PublicStudentProfile({ params }: { params: Promise
         </div>
         <CardContent className="relative pt-20 px-6 md:px-10">
           <div className="absolute -top-16 left-6 md:left-10">
-            <div className="w-32 h-32 bg-background rounded-none border-2 border-primary flex items-center justify-center text-5xl font-black text-primary shadow-[0_0_20px_rgba(59,130,246,0.2)] font-mono">
+            <div className="w-32 h-32 bg-background rounded-none border-2 border-primary flex items-center justify-center text-5xl font-black text-primary shadow-[0_0_20px_rgba(239,68,68,0.2)] font-mono">
               {profileData?.full_name?.charAt(0) || 'S'}
             </div>
           </div>
@@ -92,7 +92,7 @@ export default async function PublicStudentProfile({ params }: { params: Promise
                  <Calendar className="w-3 h-3" /> HANDSHAKE_CLASS: {student.graduation_year}
                </div>
                {student.availability === 'actively_looking' && (
-                 <span className="bg-primary/20 text-primary px-3 py-1 font-black uppercase tracking-widest border border-primary/30 shadow-[0_0_10px_rgba(59,130,246,0.1)]">
+                 <span className="bg-primary/20 text-primary px-3 py-1 font-black uppercase tracking-widest border border-primary/30 shadow-[0_0_10px_rgba(239,68,68,0.1)]">
                    STATUS: ACTIVE_LOOKING
                  </span>
                )}

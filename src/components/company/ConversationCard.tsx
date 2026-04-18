@@ -9,7 +9,7 @@ import { updateConversationTag, updateConversationNote } from '@/app/(company)/c
 
 const TAGS = [
   { id: 'strong_fit', label: 'STRONG_FIT', color: 'bg-primary/20 text-primary border-primary glow-border' },
-  { id: 'follow_up', label: 'FOLLOW_UP', color: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/40' },
+  { id: 'follow_up', label: 'FOLLOW_UP', color: 'bg-red-500/20 text-red-400 border-red-500/40' },
   { id: 'not_now', label: 'NOT_NOW', color: 'bg-white/5 text-white/40 border-white/10' },
   { id: 'untagged', label: 'UNTRIAGED', color: 'bg-white/5 text-white/20 border-white/10 opacity-50' }
 ]
