@@ -5,12 +5,13 @@ import { Briefcase, Building2, MapPin, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
-export default async function StudentJobsBoardPage({ searchParams }: { searchParams: { q?: string } }) {
+export default async function StudentJobsBoardPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const resolvedParams = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    redirect('/auth/login')
+    redirect('/login')
   }
 
   let query = supabase
@@ -24,14 +25,14 @@ export default async function StudentJobsBoardPage({ searchParams }: { searchPar
     .eq('is_active', true)
     .order('created_at', { ascending: false })
 
-  if (searchParams.q) {
-    query = query.ilike('title', `%${searchParams.q}%`)
+  if (resolvedParams.q) {
+    query = query.ilike('title', `%${resolvedParams.q}%`)
   }
 
   const { data: jobs } = await query
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-5xl mx-auto">
+    <div className="container mx-auto p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-5xl">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 pb-6 border-b border-primary/20">
         <div>
           <h1 className="text-2xl font-black text-white tracking-widest uppercase flex items-center gap-3">
@@ -45,7 +46,7 @@ export default async function StudentJobsBoardPage({ searchParams }: { searchPar
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/40" />
           <Input 
             name="q"
-            defaultValue={searchParams.q}
+            defaultValue={resolvedParams.q}
             placeholder="SEARCH ROLES..." 
             className="system-input pl-10 h-10" 
           />

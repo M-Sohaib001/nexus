@@ -32,6 +32,19 @@ export async function updateApplicationStatusAction(applicationId: string, statu
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: "Unauthenticated" }
 
+  const VALID_STATUSES = ['pending', 'reviewed', 'accepted', 'rejected']
+  if (!VALID_STATUSES.includes(status)) return { error: 'Invalid status' }
+
+  // Verify ownership
+  const { data: job } = await supabase
+    .from('jobs')
+    .select('id')
+    .eq('id', jobId)
+    .eq('company_id', user.id)
+    .single()
+    
+  if (!job) return { error: "Unauthorized access or job not found." }
+
   // RLS ensures only the company that owns the job can update it
   const { error } = await supabase
     .from('job_applications')

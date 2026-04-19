@@ -3,13 +3,20 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Building2, Globe, Search, Briefcase, ChevronRight } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 
-export default async function StudentCompaniesPage() {
+export default async function StudentCompaniesPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const resolvedParams = await searchParams
   const supabase = await createClient()
   
-  const { data: companies } = await supabase
+  let query = supabase
     .from('companies')
     .select('*')
     .order('name')
+
+  if (resolvedParams.q) {
+    query = query.or(`name.ilike.%${resolvedParams.q}%,industry.ilike.%${resolvedParams.q}%`)
+  }
+
+  const { data: companies } = await query
 
   return (
     <div className="container mx-auto p-4 md:p-8 max-w-7xl space-y-8 mt-4">
@@ -19,13 +26,15 @@ export default async function StudentCompaniesPage() {
           <p className="text-primary/60 text-xs font-black uppercase tracking-[0.2em]">RECRUITMENT_PARTNERS // LIVE_DATABASE</p>
         </div>
         
-        <div className="relative w-full md:w-96 group">
+        <form className="relative w-full md:w-96 group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/40 group-focus-within:text-primary transition-colors" />
           <Input 
+             name="q"
+             defaultValue={resolvedParams.q}
              placeholder="FILTER_BY_NAME_OR_INDUSTRY..." 
              className="pl-10 h-10 bg-primary/5 border-primary/20 rounded-none text-[10px] font-black uppercase tracking-widest focus:ring-1 focus:ring-primary shadow-[0_0_10px_rgba(239,68,68,0.05)]"
           />
-        </div>
+        </form>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

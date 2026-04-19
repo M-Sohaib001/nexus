@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { CheckCircle2, Bookmark, Briefcase } from 'lucide-react'
+import { CheckCircle2, Bookmark, Briefcase, Search } from 'lucide-react'
 import { useState } from 'react'
 import { toggleInterestSignalAction } from '@/app/(company)/company/discover/actions'
 import Link from 'next/link'
@@ -90,8 +90,36 @@ export function StudentDiscoveryGrid({
                 <SelectItem value="all">ALL_STATUS</SelectItem>
                 <SelectItem value="actively_looking">ACTIVE_LOOKING</SelectItem>
                 <SelectItem value="open">OPEN_TO_OFFERS</SelectItem>
+                <SelectItem value="not_available">NOT_AVAILABLE</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="system-label text-primary/70">PARAM: TECH_SKILL</Label>
+            <div className="flex gap-2">
+              <input 
+                type="text"
+                placeholder="e.g. React"
+                className="w-full h-10 px-3 bg-transparent border border-primary/30 font-mono text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary"
+                defaultValue={searchParams.get('skill') || ''}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleFilterChange('skill', e.currentTarget.value)
+                  }
+                }}
+              />
+              <Button 
+                variant="outline" 
+                className="rounded-none border-primary/30 h-10 px-3 hover:bg-primary/20"
+                onClick={() => {
+                  const input = document.querySelector('input[placeholder="e.g. React"]') as HTMLInputElement
+                  if(input) handleFilterChange('skill', input.value)
+                }}
+              >
+                <Search className="w-4 h-4 text-primary" />
+              </Button>
+            </div>
           </div>
 
           <div className="flex items-center space-x-3 h-10 px-2 border border-primary/20 bg-primary/5">

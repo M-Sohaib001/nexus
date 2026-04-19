@@ -30,8 +30,17 @@ export default async function StudentDashboard() {
     return (
       <div className="container mx-auto p-4 md:p-8 max-w-6xl mt-6">
         <h1 className="system-header text-primary">STUDENT_CONTROL_PANEL</h1>
-        <div className="p-12 text-sm text-muted-foreground border border-primary/20 bg-primary/5 mt-8 font-mono text-center uppercase tracking-widest">
-          INITIALIZING MODULE...
+        <div className="mt-12 p-12 border border-primary/20 bg-primary/5 text-center space-y-4 relative overflow-hidden">
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+          <p className="text-primary font-black text-sm uppercase tracking-widest">PROFILE_RECORD_NOT_FOUND</p>
+          <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest max-w-sm mx-auto leading-relaxed">
+            Your student profile is initializing. This usually resolves in a few seconds. If you&apos;re a company official, please navigate to your company dashboard.
+          </p>
+          <div className="flex gap-2 justify-center mt-4">
+            <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
         </div>
       </div>
     )
@@ -121,7 +130,7 @@ export default async function StudentDashboard() {
               <ResumeUploader initialUrl={student?.resume_url ?? null} />
             </TabsContent>
             <TabsContent value="build" className="mt-6">
-              <ResumeBuilder student={student} fyps={fyps || []} />
+              <ResumeBuilder student={student} fyps={fyps || []} experiences={experiences || []} />
             </TabsContent>
           </Tabs>
         </div>
@@ -141,14 +150,22 @@ export default async function StudentDashboard() {
               </div>
             ) : (
               conversations.map((conv: any) => {
-                const compName = (!conv.companies?.name || conv.companies?.name === '') ? 'Undisclosed Next-Gen Firm' : conv.companies?.name
+                const compName = (!conv.companies?.name || conv.companies?.name === '') ? 'Undisclosed Entity' : conv.companies?.name
                 return (
-                  <div key={conv.id} className="p-6 border bg-secondary/15 rounded-xl flex flex-col hover:border-primary/40 transition-colors shadow-sm">
-                    <h3 className="font-extrabold text-xl mb-1.5 text-foreground/90">{compName}</h3>
-                    <p className="text-[11px] font-black tracking-widest uppercase text-muted-foreground bg-background border border-border/80 px-2 py-0.5 rounded w-fit">{conv.companies?.industry || 'Stealth Network'}</p>
-                    <div className="mt-8 pt-4 border-t border-border/50 flex justify-between items-center text-[10px] uppercase font-black tracking-wider text-muted-foreground">
-                      <span>Connection Logged</span>
-                      <span>{new Date(conv.started_at).toLocaleDateString()}</span>
+                  <div key={conv.id} className="p-5 border border-primary/20 bg-primary/5 flex flex-col hover:border-primary/50 transition-all shadow-none relative group">
+                    <div className="absolute top-0 right-0 p-1.5 text-[7px] tracking-widest font-black text-primary/30 uppercase">{conv.id.split('-')[0]}</div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-8 h-8 border border-primary/30 bg-black/40 flex items-center justify-center text-primary font-black text-sm shrink-0">
+                        {compName.charAt(0)}
+                      </div>
+                      <div>
+                        <h3 className="font-black text-sm uppercase text-white tracking-tight leading-none">{compName}</h3>
+                        <p className="text-[9px] font-bold tracking-widest uppercase text-primary/40 mt-0.5">{conv.companies?.industry || 'STEALTH_SECTOR'}</p>
+                      </div>
+                    </div>
+                    <div className="mt-auto pt-3 border-t border-primary/10 flex justify-between items-center text-[9px] uppercase font-black tracking-wider text-zinc-600">
+                      <span>CONNECTION_LOGGED</span>
+                      <span>{new Date(conv.started_at).toLocaleDateString('en-GB')}</span>
                     </div>
                   </div>
                 )

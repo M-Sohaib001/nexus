@@ -30,7 +30,10 @@ export default async function FypDiscovery({
   }
   if (tech) {
     // Basic ilike mapping searching through the tech stack array casted natively as text
-    query = query.filter('tech_stack', 'cs', `{${tech}}`)
+    const tL = tech.toLowerCase()
+    const tU = tech.toUpperCase()
+    const tC = tL.charAt(0).toUpperCase() + tL.slice(1)
+    query = query.or(`tech_stack.cs.{${tech}},tech_stack.cs.{${tL}},tech_stack.cs.{${tU}},tech_stack.cs.{${tC}}`)
   }
 
   query = query.range(offset, offset + limit - 1)

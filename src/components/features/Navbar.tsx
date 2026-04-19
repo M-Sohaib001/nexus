@@ -37,11 +37,13 @@ export function Navbar({ user, profile, student }: NavbarProps) {
         href: isStudent ? '/student/dashboard' : '/company/dashboard',
         icon: Terminal
       },
-      {
-        label: 'DISCOVERY',
-        href: '/company/discover',
-        icon: Search
-      },
+      ...((isCompany || (!isStudent && !isCompany)) ? [
+        {
+          label: 'DISCOVERY',
+          href: '/company/discover',
+          icon: Search
+        }
+      ] : []),
       ...(isStudent ? [
         {
           label: 'R&D PROJECTS',

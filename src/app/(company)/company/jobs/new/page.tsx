@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 export default function NewJobPage() {
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="container mx-auto p-4 md:p-8 max-w-5xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex items-center gap-4 pb-6 border-b border-primary/20">
         <div className="w-12 h-12 bg-primary/10 border border-primary/20 flex items-center justify-center">
           <Briefcase className="w-6 h-6 text-primary" />

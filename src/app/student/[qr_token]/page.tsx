@@ -46,22 +46,22 @@ export default async function PublicStudentProfile({ params }: { params: Promise
   // Identity Bounds: Automatically establish or retrieve Conversational analytics safely evaluating PostgREST limits!
   let conversation = null
   if (user && profile?.role === 'company_official') {
-     const { data: newConv, error } = await supabase
+     const { data: existingConv } = await supabase
        .from('conversations')
-       .insert({ student_id: student.id, company_id: user.id })
        .select('*')
+       .eq('student_id', student.id)
+       .eq('company_id', user.id)
        .maybeSingle()
-
-     if (error?.code === '23505') { // Postgres Unique Constraint Violation resolves Racing Collisions!
-        const { data: existingConv } = await supabase
-           .from('conversations')
-           .select('*')
-           .eq('student_id', student.id)
-           .eq('company_id', user.id)
-           .maybeSingle()
-        conversation = existingConv || null
+       
+     if (existingConv) {
+       conversation = existingConv
      } else {
-        conversation = newConv || null
+       const { data: newConv, error } = await supabase
+         .from('conversations')
+         .insert({ student_id: student.id, company_id: user.id })
+         .select('*')
+         .maybeSingle()
+       conversation = newConv || null
      }
   }
 

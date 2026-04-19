@@ -4,12 +4,13 @@ import Link from 'next/link'
 import { ArrowLeft, Building2, MapPin, Briefcase, FileText } from 'lucide-react'
 import { ApplyButton } from './ApplyButton'
 
-export default async function StudentJobDetailsPage({ params }: { params: { id: string } }) {
+export default async function StudentJobDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    redirect('/auth/login')
+    redirect('/login')
   }
 
   const { data: job } = await supabase
@@ -20,7 +21,7 @@ export default async function StudentJobDetailsPage({ params }: { params: { id: 
         name, logo_url, description, website_url
       )
     `)
-    .eq('id', params.id)
+    .eq('id', resolvedParams.id)
     .single()
 
   if (!job) {
@@ -31,7 +32,7 @@ export default async function StudentJobDetailsPage({ params }: { params: { id: 
   const { data: application } = await supabase
     .from('job_applications')
     .select('id')
-    .eq('job_id', params.id)
+    .eq('job_id', resolvedParams.id)
     .eq('student_id', user.id)
     .single()
 
@@ -39,7 +40,7 @@ export default async function StudentJobDetailsPage({ params }: { params: { id: 
   const company = job.companies
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-4xl mx-auto">
+    <div className="container mx-auto p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-4xl">
       <div className="flex items-center gap-4 pb-6 border-b border-primary/20">
         <Link href="/student/jobs" className="text-zinc-500 hover:text-primary transition-colors">
           <ArrowLeft className="w-6 h-6" />

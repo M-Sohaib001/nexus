@@ -192,16 +192,15 @@ export function CrmConversationRow({
           </div>
         )}
 
-        {/* ── Expanded: Notes + timestamp ── */}
-        {expanded && (
-          <div className="mt-5 space-y-3 border-t pt-5">
+          {expanded && (
+          <div className="mt-5 space-y-3 border-t border-primary/10 pt-5">
             <div className="flex justify-between items-center">
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                Private Notes
+                PRIVATE_NOTES
               </p>
               {isSaving && (
-                <span className="text-[10px] text-green-600 font-extrabold uppercase animate-pulse">
-                  Saving…
+                <span className="text-[10px] text-green-500 font-extrabold uppercase animate-pulse">
+                  SAVING...
                 </span>
               )}
             </div>
@@ -210,11 +209,22 @@ export function CrmConversationRow({
               onChange={(e) => setNote(e.target.value)}
               onBlur={handleNoteBlur}
               placeholder="Add evaluation notes, next steps, red flags…"
-              className="min-h-[100px] resize-none text-sm bg-background/80 focus-visible:ring-primary/50"
+              className="min-h-[100px] resize-none text-sm bg-background/80 focus-visible:ring-primary/50 rounded-none border-primary/20"
             />
-            <p className="text-[9px] text-muted-foreground text-right font-mono opacity-40">
-              LOG_TIMESTAMP: {new Date(startedAt).getTime()} // {new Date(startedAt).toLocaleDateString('en-GB')}
-            </p>
+            <div className="flex justify-between items-center">
+              <p className="text-[9px] text-muted-foreground font-mono opacity-40">
+                LOG_TIMESTAMP: {new Date(startedAt).getTime()} // {new Date(startedAt).toLocaleDateString('en-GB')}
+              </p>
+              <Button
+                size="sm"
+                disabled={isSaving || note === privateNote}
+                onClick={handleNoteBlur}
+                className="rounded-none text-[10px] font-black uppercase tracking-widest h-8 bg-primary/20 hover:bg-primary/40 text-primary border border-primary/30"
+                variant="ghost"
+              >
+                {isSaving ? 'SAVING...' : 'SAVE_NOTE'}
+              </Button>
+            </div>
           </div>
         )}
       </CardContent>

@@ -10,6 +10,59 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'AUTHENTICATION_REQUIRED' }, { status: 401 })
   }
 
+  const contentType = request.headers.get('content-type') || ''
+
+  // ── Branch A: JSON payload with cloudinary_url → parse-only (from ResumeUploader) ──
+  if (contentType.includes('application/json')) {
+    const body = await request.json()
+    const cloudinaryUrl: string | undefined = body.cloudinary_url
+
+    if (!cloudinaryUrl) {
+      return NextResponse.json({ error: 'MISSING_URL' }, { status: 400 })
+    }
+
+    try {
+      const fileRes = await fetch(cloudinaryUrl)
+      if (!fileRes.ok) throw new Error('Failed to fetch PDF from Cloudinary')
+      const arrayBuffer = await fileRes.arrayBuffer()
+      const buffer = Buffer.from(arrayBuffer)
+
+      let suggestions = { skills: [] as string[], projects: [] as string[] }
+
+      try {
+        const pdf = require('pdf-parse')
+        const pdfData = await pdf(buffer)
+        const text = pdfData.text
+        const textLower = text.toLowerCase()
+
+        const techKeywords = [
+          'react', 'next.js', 'typescript', 'javascript', 'node.js', 'python', 'django',
+          'flask', 'fastapi', 'postgresql', 'mongodb', 'supabase', 'firebase', 'aws',
+          'docker', 'kubernetes', 'tensorflow', 'pytorch', 'machine learning', 'deep learning',
+          'java', 'spring', 'c++', 'rust', 'go', 'flutter', 'react native', 'tailwind', 'css'
+        ]
+        suggestions.skills = techKeywords.filter(skill => textLower.includes(skill.toLowerCase()))
+
+        const lines = text.split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 5)
+        const projectMarkers = ['project', 'built', 'developed', 'application']
+        suggestions.projects = lines.filter((line: string) => {
+          const lineLower = line.toLowerCase()
+          const hasMarker = projectMarkers.some(m => lineLower.includes(m))
+          const isCapitalized = /^[A-Z]/.test(line)
+          const isNotTooLong = line.length < 100
+          return (hasMarker && isCapitalized && isNotTooLong)
+        }).slice(0, 3)
+      } catch (parseError) {
+        console.error('PDF_PARSE_ERROR:', parseError)
+      }
+
+      return NextResponse.json({ success: true, suggestions })
+    } catch (error: any) {
+      return NextResponse.json({ error: `PARSE_ERROR: ${error.message}` }, { status: 500 })
+    }
+  }
+
+  // ── Branch B: Multipart upload → full upload + parse (from ResumeBuilder) ──
   const formData = await request.formData()
   const file = formData.get('file') as File | null
 

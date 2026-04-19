@@ -20,14 +20,28 @@ interface ResumeSection {
 interface Props {
   student: any
   fyps: any[]
+  experiences?: any[]
 }
 
-export function ResumeBuilder({ student, fyps }: Props) {
+export function ResumeBuilder({ student, fyps, experiences = [] }: Props) {
+  const profileData = Array.isArray(student.profiles) ? student.profiles[0] : student.profiles
+
   const [education, setEducation] = useState<ResumeSection[]>([
     { id: '1', title: student.degree_program || 'Degree', subtitle: 'University Name', date: `Class of ${student.graduation_year}`, description: '' }
   ])
-  const [experience, setExperience] = useState<ResumeSection[]>([])
-  const [skills, setSkills] = useState<string>('React, Next.js, TypeScript, Tailwind CSS')
+  
+  const initialExperiences = experiences.map(exp => ({
+     id: exp.id,
+     title: exp.title,
+     subtitle: exp.company,
+     date: `${exp.start_date} - ${exp.end_date || 'Present'}`,
+     description: exp.description || ''
+  }))
+  const [experience, setExperience] = useState<ResumeSection[]>(initialExperiences)
+  
+  const [skills, setSkills] = useState<string>(
+    Array.isArray(student.skills) ? student.skills.join(', ') : 'React, Next.js, TypeScript, Tailwind CSS'
+  )
   const [isExporting, setIsExporting] = useState(false)
   const [exportSuccess, setExportSuccess] = useState(false)
 
@@ -63,7 +77,7 @@ export function ResumeBuilder({ student, fyps }: Props) {
 
       // Upload to Nexus server
       const formData = new FormData()
-      formData.append('file', pdfBlob, `${student.profiles[0].full_name.replace(/\s+/g, '_')}_Resume.pdf`)
+      formData.append('file', pdfBlob, `${profileData.full_name.replace(/\s+/g, '_')}_Resume.pdf`)
       
       const res = await fetch('/api/upload-resume', {
         method: 'POST',
@@ -166,17 +180,17 @@ export function ResumeBuilder({ student, fyps }: Props) {
           <Button 
             disabled={isExporting} 
             onClick={handleExport} 
-            className="flex-1 font-bold h-12 shadow-lg"
+            className="flex-1 rounded-none h-12 bg-primary hover:bg-primary/90 font-black uppercase tracking-[0.2em] text-xs shadow-[0_0_15px_rgba(239,68,68,0.2)]"
           >
-            {isExporting ? 'Generating PDF...' : 'Save & Export to Nexus Profile'}
+            {isExporting ? 'GENERATING_PDF...' : 'EXPORT_RESUME'}
             {!isExporting && <FileDown className="w-4 h-4 ml-2" />}
           </Button>
         </div>
         
         {exportSuccess && (
-          <div className="flex items-center gap-2 text-green-600 bg-green-500/10 border border-green-500/20 px-4 py-3 rounded-xl font-bold animate-in fade-in slide-in-from-bottom-2">
-            <CheckCircle2 className="w-5 h-5" />
-            Resume synced to your profile successfully!
+          <div className="flex items-center gap-2 text-green-500 bg-green-500/10 border border-green-500/20 px-4 py-3 font-black uppercase tracking-widest text-[10px] animate-in fade-in slide-in-from-bottom-2">
+            <CheckCircle2 className="w-4 h-4" />
+            RESUME_UPLOAD_SUCCESS — PROFILE_UPDATED
           </div>
         )}
       </div>
@@ -190,7 +204,7 @@ export function ResumeBuilder({ student, fyps }: Props) {
             style={{ borderRadius: '1px' }}
           >
             <header className="border-b-2 border-primary pb-6">
-              <h1 className="text-4xl font-black uppercase tracking-tighter text-black">{student.profiles[0].full_name}</h1>
+              <h1 className="text-4xl font-black uppercase tracking-tighter text-black">{profileData.full_name}</h1>
               <div className="flex flex-wrap gap-4 text-xs font-bold mt-2 text-zinc-600">
                 <span>{student.degree_program}</span>
                 <span>•</span>

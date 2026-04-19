@@ -49,7 +49,7 @@ export function ResumeUploader({ initialUrl }: { initialUrl: string | null }) {
     setErrorMsg('')
 
     try {
-      // Direct unsigned upload to Cloudinary /raw/upload endpoint
+      // Direct unsigned upload to Cloudinary
       const form = new FormData()
       form.append('file', file)
       form.append('upload_preset', 'nexus_unsigned')
@@ -67,10 +67,9 @@ export function ResumeUploader({ initialUrl }: { initialUrl: string | null }) {
         return
       }
 
-      // Validate it's a raw upload URL
       const secureUrl: string = data.secure_url
 
-      // Persist to DB via lightweight API route
+      // Persist URL to DB
       const saveResult = await saveResumeUrl(secureUrl)
       if (saveResult.error) {
         setErrorMsg(`SAVE_FAILED: ${saveResult.error}`)
@@ -81,6 +80,22 @@ export function ResumeUploader({ initialUrl }: { initialUrl: string | null }) {
       setUrl(secureUrl)
       setStatus('success')
       setTimeout(() => setStatus('idle'), 3000)
+
+      // Optionally trigger server-side PDF parsing for Resume Assist
+      try {
+        const parseRes = await fetch('/api/upload-resume', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cloudinary_url: secureUrl }),
+        })
+        const parseData = await parseRes.json()
+        if (parseData.suggestions && (parseData.suggestions.skills?.length > 0 || parseData.suggestions.projects?.length > 0)) {
+          setSuggestions(parseData.suggestions)
+          setShowAssist(true)
+        }
+      } catch {
+        // Non-blocking — parsing failure shouldn't prevent upload success
+      }
 
     } catch (e: any) {
       console.error('RESUME_UPLOAD_ERROR:', e)

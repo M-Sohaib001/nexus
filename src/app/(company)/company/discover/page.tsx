@@ -14,6 +14,7 @@ export default async function CompanyDiscover({
   const gradYear = resolvedParams.graduation_year as string
   const availability = resolvedParams.availability as string
   const isAiNative = resolvedParams.is_ai_native_builder === 'true'
+  const skill = resolvedParams.skill as string
   
   const page = parseInt((resolvedParams.page as string) || '1')
   const limit = 20
@@ -35,6 +36,12 @@ export default async function CompanyDiscover({
   }
   if (isAiNative) {
     query = query.eq('is_ai_native_builder', true)
+  }
+  if (skill) {
+    const sL = skill.toLowerCase()
+    const sU = skill.toUpperCase()
+    const sC = sL.charAt(0).toUpperCase() + sL.slice(1)
+    query = query.or(`skills.cs.{${skill}},skills.cs.{${sL}},skills.cs.{${sU}},skills.cs.{${sC}}`)
   }
 
   query = query.range(offset, offset + limit - 1)

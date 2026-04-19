@@ -9,7 +9,7 @@ export default async function CompanyJobsPage() {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    redirect('/auth/login')
+    redirect('/login')
   }
 
   const { data: jobs } = await supabase
@@ -19,7 +19,7 @@ export default async function CompanyJobsPage() {
     .order('created_at', { ascending: false })
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="container mx-auto p-4 md:p-8 max-w-5xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex items-center justify-between pb-6 border-b border-primary/20">
         <div>
           <h1 className="text-2xl font-black text-white tracking-widest uppercase flex items-center gap-3">

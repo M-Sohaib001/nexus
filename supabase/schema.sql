@@ -23,13 +23,24 @@ CREATE POLICY "Users can update their own profile" ON public.profiles FOR UPDATE
 -- Function to handle new user signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
+DECLARE
+  extracted_role text;
+  final_role public.user_role;
 BEGIN
+  extracted_role := new.raw_user_meta_data->>'role';
+  
+  IF extracted_role = 'company_official' THEN
+    final_role := 'company_official'::public.user_role;
+  ELSE
+    final_role := 'student'::public.user_role;
+  END IF;
+
   INSERT INTO public.profiles (id, full_name, avatar_url, role)
   VALUES (
     new.id,
     new.raw_user_meta_data->>'full_name',
     new.raw_user_meta_data->>'avatar_url',
-    (new.raw_user_meta_data->>'role')::public.user_role
+    final_role
   );
   RETURN new;
 END;
@@ -167,6 +178,7 @@ CREATE POLICY "Companies can update their own row" ON public.companies FOR UPDAT
 CREATE POLICY "Students can view signals aimed at them" ON public.interest_signals FOR SELECT USING (auth.uid() = student_id);
 CREATE POLICY "Companies can view signals they created" ON public.interest_signals FOR SELECT USING (auth.uid() = company_id);
 CREATE POLICY "Companies can insert their own signals" ON public.interest_signals FOR INSERT WITH CHECK (auth.uid() = company_id);
+CREATE POLICY "Companies can delete their own signals" ON public.interest_signals FOR DELETE USING (auth.uid() = company_id);
 
 -- =====================================
 -- PHASE 4: Conversation Cards System

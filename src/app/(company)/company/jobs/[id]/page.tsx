@@ -5,18 +5,19 @@ import { Briefcase, Users, ArrowLeft, ExternalLink, FileText } from 'lucide-reac
 import Link from 'next/link'
 import { ApplicationStatusToggle } from '@/components/company/ApplicationStatusToggle'
 
-export default async function JobDetailsPage({ params }: { params: { id: string } }) {
+export default async function JobDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    redirect('/auth/login')
+    redirect('/login')
   }
 
   const { data: job } = await supabase
     .from('jobs')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', resolvedParams.id)
     .single()
 
   if (!job || job.company_id !== user.id) {
@@ -34,11 +35,11 @@ export default async function JobDetailsPage({ params }: { params: { id: string 
         profiles!inner ( full_name, avatar_url )
       )
     `)
-    .eq('job_id', params.id)
+    .eq('job_id', resolvedParams.id)
     .order('created_at', { ascending: false })
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="container mx-auto p-4 md:p-8 max-w-5xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex items-center gap-4 pb-6 border-b border-primary/20">
         <Link href="/company/jobs" className="text-zinc-500 hover:text-primary transition-colors">
           <ArrowLeft className="w-6 h-6" />
