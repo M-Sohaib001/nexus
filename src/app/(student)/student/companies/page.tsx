@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Building2, Globe, Search, Briefcase } from 'lucide-react'
+import { Building2, Globe, Search, Briefcase, ChevronRight } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 
 export default async function StudentCompaniesPage() {
@@ -68,10 +68,22 @@ export default async function StudentCompaniesPage() {
                       <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
                       <span className="text-[8px] font-black uppercase tracking-widest text-primary">STATUS: RECRUITING</span>
                    </div>
-                   <button className="text-[9px] font-black uppercase tracking-widest text-primary/60 hover:text-primary transition-colors flex items-center gap-1.5 border border-primary/20 px-3 py-1 bg-primary/5 hover:bg-primary/10">
-                      VIEW_DETAILS 
-                      <Globe className="w-3 h-3" />
-                   </button>
+                   <div className="flex gap-2">
+                     {company.website_url && (
+                        <a 
+                          href={company.website_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-[9px] font-black uppercase tracking-widest text-primary/60 hover:text-primary transition-colors flex items-center gap-1.5 border border-primary/20 px-3 py-1 bg-primary/5 hover:bg-primary/10"
+                        >
+                           SITE <Globe className="w-3 h-3" />
+                        </a>
+                     )}
+                     <button className="text-[9px] font-black uppercase tracking-widest text-primary/60 hover:text-primary transition-colors flex items-center gap-1.5 border border-primary/20 px-3 py-1 bg-primary/5 hover:bg-primary/10">
+                        DETAILS 
+                        <ChevronRight className="w-3 h-3" />
+                     </button>
+                   </div>
                 </div>
               </CardContent>
             </Card>

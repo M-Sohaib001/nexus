@@ -93,7 +93,8 @@ CREATE TABLE IF NOT EXISTS public.companies (
   name TEXT,
   industry TEXT,
   description TEXT,
-  logo_url TEXT
+  logo_url TEXT,
+  website_url TEXT
 );
 
 CREATE TABLE IF NOT EXISTS public.interest_signals (

@@ -47,11 +47,18 @@ export function Navbar({ user, profile, student }: NavbarProps) {
         href: '/student/companies',
         icon: Building2
       }] : []),
-      ...(isCompany ? [{
-        label: 'INTERACTION_LOG',
-        href: '/company/crm',
-        icon: BarChart3
-      }] : []),
+      ...(isCompany ? [
+        {
+          label: 'INTERACTION_LOG',
+          href: '/company/crm',
+          icon: BarChart3
+        },
+        {
+          label: 'PROFILE',
+          href: '/company/profile',
+          icon: User
+        }
+      ] : []),
       ...(isStudent && student?.qr_token ? [{
         label: 'PROFILE_MODULE',
         href: `/student/${student.qr_token}`,
