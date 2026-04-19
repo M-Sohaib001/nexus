@@ -128,7 +128,7 @@ export default async function PublicStudentProfile({ params }: { params: Promise
               </a>
             )}
             {student.resume_url && (
-              <a href={student.resume_url} target="_blank" rel="noopener noreferrer">
+              <a href={`https://docs.google.com/viewer?url=${encodeURIComponent(student.resume_url)}`} target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" className="border-primary/40 font-black text-[10px] uppercase tracking-widest">
                   EXTRACT_DOC: RESUME
                 </Button>

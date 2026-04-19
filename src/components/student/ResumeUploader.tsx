@@ -54,9 +54,10 @@ export function ResumeUploader({ initialUrl }: { initialUrl: string | null }) {
       form.append('file', file)
       form.append('upload_preset', 'nexus_unsigned')
       form.append('resource_type', 'raw')
+      form.append('folder', 'nexus/resumes')
 
       const res = await fetch(
-        `https://api.cloudinary.com/v1_1/${cloudName}/raw/upload`,
+        `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
         { method: 'POST', body: form }
       )
       const data = await res.json()
@@ -167,7 +168,7 @@ export function ResumeUploader({ initialUrl }: { initialUrl: string | null }) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
+            onClick={() => window.open(`https://docs.google.com/viewer?url=${encodeURIComponent(url)}`, '_blank')}
             className="font-black text-[10px] uppercase tracking-widest px-6 border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-all"
           >
             VIEW_RESUME

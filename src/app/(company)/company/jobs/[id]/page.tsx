@@ -84,7 +84,7 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ id:
                           <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{studentData.degree_program}</p>
                           <div className="flex gap-3 mt-2">
                             {studentData.resume_url && (
-                              <a href={studentData.resume_url} target="_blank" rel="noreferrer" className="text-[10px] text-blue-400 hover:text-blue-300 font-black uppercase tracking-widest flex items-center gap-1">
+                              <a href={`https://docs.google.com/viewer?url=${encodeURIComponent(studentData.resume_url)}`} target="_blank" rel="noreferrer" className="text-[10px] text-blue-400 hover:text-blue-300 font-black uppercase tracking-widest flex items-center gap-1">
                                 <FileText className="w-3 h-3" /> RESUME
                               </a>
                             )}

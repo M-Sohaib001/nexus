@@ -1,0 +1,4 @@
+fix: use Google Docs Viewer for resume links to prevent forced downloads
+
+- Updated ResumeUploader, CrmConversationRow, Public Profile, and Job Applicants view.
+- All resume links now open via https://docs.google.com/viewer.

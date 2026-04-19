@@ -154,7 +154,7 @@ export function CrmConversationRow({
                 <span className="px-2 py-0.5 bg-primary/10 text-primary text-[9px] font-black uppercase tracking-widest border border-primary/30">
                   RESUME_DETECTED
                 </span>
-                <a href={resumeUrl} target="_blank" rel="noopener noreferrer">
+                <a href={`https://docs.google.com/viewer?url=${encodeURIComponent(resumeUrl)}`} target="_blank" rel="noopener noreferrer">
                   <Button variant="outline" size="sm" className="h-7 border-primary/40">
                     DOWNLOAD_DOC
                   </Button>
