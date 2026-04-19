@@ -91,7 +91,9 @@ ALTER TABLE public.fyps ENABLE ROW LEVEL SECURITY;
 CREATE TABLE IF NOT EXISTS public.companies (
   id UUID PRIMARY KEY REFERENCES public.profiles(id) ON DELETE CASCADE,
   name TEXT,
-  industry TEXT
+  industry TEXT,
+  description TEXT,
+  logo_url TEXT
 );
 
 CREATE TABLE IF NOT EXISTS public.interest_signals (
