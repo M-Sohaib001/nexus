@@ -1,0 +1,5 @@
+feat: allow students to remove resumes from profiles
+
+- Added removeResumeAction server action.
+- Added Trash/Remove button to ResumeUploader component.
+- Implemented confirmation dialog and loading states for removal.

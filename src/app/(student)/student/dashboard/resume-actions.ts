@@ -41,3 +41,22 @@ export async function applyResumeAssistAction(data: { skills: string[], projects
   revalidatePath('/student/dashboard')
   return { success: true }
 }
+
+export async function removeResumeAction() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Unauthenticated" }
+
+  const { error } = await supabase
+    .from('students')
+    .update({ resume_url: null })
+    .eq('id', user.id)
+
+  if (error) {
+    console.error('REMOVE_RESUME_ERROR:', error)
+    return { error: `REMOVE_RESUME_ERROR: ${error.message}` }
+  }
+
+  revalidatePath('/student/dashboard')
+  return { success: true }
+}

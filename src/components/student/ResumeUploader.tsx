@@ -2,8 +2,9 @@
 
 import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
-import { FileText, UploadCloud, CheckCircle2, AlertCircle, X } from 'lucide-react'
+import { FileText, UploadCloud, CheckCircle2, AlertCircle, X, Trash2 } from 'lucide-react'
 import { ResumeAssistModal } from './ResumeAssistModal'
+import { removeResumeAction } from '@/app/(student)/student/dashboard/resume-actions'
 
 async function saveResumeUrl(url: string): Promise<{ error?: string }> {
   const res = await fetch('/api/save-resume-url', {
@@ -165,14 +166,36 @@ export function ResumeUploader({ initialUrl }: { initialUrl: string | null }) {
               SECURE_CLOUD_LINK // {url.split('/').pop()}
             </p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => window.open(`https://docs.google.com/viewer?url=${encodeURIComponent(url)}`, '_blank')}
-            className="font-black text-[10px] uppercase tracking-widest px-6 border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-all"
-          >
-            VIEW_RESUME
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open(`https://docs.google.com/viewer?url=${encodeURIComponent(url)}`, '_blank')}
+              className="font-black text-[10px] uppercase tracking-widest px-6 border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-all"
+            >
+              VIEW_RESUME
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={async () => {
+                if (confirm('TERMINATE_RESUME_LINK: Are you sure?')) {
+                  setStatus('uploading')
+                  const res = await removeResumeAction()
+                  if (res.success) {
+                    setUrl(null)
+                    setStatus('idle')
+                  } else {
+                    setErrorMsg(res.error || 'REMOVE_FAILED')
+                    setStatus('error')
+                  }
+                }
+              }}
+              className="font-black text-[10px] uppercase tracking-widest px-4 text-red-500/60 hover:text-red-500 hover:bg-red-500/5 transition-all"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="flex items-center gap-3 p-6 border-2 border-dashed border-zinc-800 bg-zinc-900/10 rounded-xl opacity-50 grayscale transition-all duration-700">
