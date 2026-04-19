@@ -34,6 +34,46 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 
+    // PHASE 21: RESUME ASSIST EXTRACTION
+    let suggestions = {
+      skills: [] as string[],
+      projects: [] as string[]
+    }
+
+    try {
+      // Dynamic require to avoid build-time static optimization issues with CJS/ESM hybrid modules
+      const pdf = require('pdf-parse')
+      const pdfData = await pdf(buffer)
+      const text = pdfData.text
+      const textLower = text.toLowerCase()
+
+      // Skill Detection (Common Tech Stack)
+      const techKeywords = [
+        'react', 'next.js', 'typescript', 'javascript', 'node.js', 'python', 'django', 
+        'flask', 'fastapi', 'postgresql', 'mongodb', 'supabase', 'firebase', 'aws', 
+        'docker', 'kubernetes', 'tensorflow', 'pytorch', 'machine learning', 'deep learning',
+        'java', 'spring', 'c++', 'rust', 'go', 'flutter', 'react native', 'tailwind', 'css'
+      ]
+
+      suggestions.skills = techKeywords.filter(skill => textLower.includes(skill.toLowerCase()))
+
+      // Project Detection (Heuristics - looking for capitalized lines that look like titles)
+      const lines = text.split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 5)
+      const projectMarkers = ['project', 'built', 'developed', 'application']
+      
+      suggestions.projects = lines.filter((line: string) => {
+        const lineLower = line.toLowerCase()
+        const hasMarker = projectMarkers.some(m => lineLower.includes(m))
+        const isCapitalized = /^[A-Z]/.test(line)
+        const isNotTooLong = line.length < 100
+        return (hasMarker && isCapitalized && isNotTooLong)
+      }).slice(0, 3) // Limit to 3 suggestions
+
+    } catch (parseError) {
+      console.error('PDF_PARSE_ERROR:', parseError)
+      // Non-blocking for upload
+    }
+
     const uploadResponse = await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
@@ -66,6 +106,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true,
       url: secure_url,
+      suggestions,
       message: 'RESUME_UPLOAD_SUCCESS' 
     })
 

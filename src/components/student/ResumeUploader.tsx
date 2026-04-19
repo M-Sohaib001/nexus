@@ -2,13 +2,16 @@
 
 import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
-import { FileText, UploadCloud, CheckCircle2, AlertCircle, X } from 'lucide-react'
+import { FileText, UploadCloud, CheckCircle2, AlertCircle, X, Sparkles } from 'lucide-react'
+import { ResumeAssistModal } from './ResumeAssistModal'
 
 export function ResumeUploader({ initialUrl }: { initialUrl: string | null }) {
   const [url, setUrl] = useState<string | null>(initialUrl)
   const [status, setStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const [dragOver, setDragOver] = useState(false)
+  const [suggestions, setSuggestions] = useState<any>(null)
+  const [showAssist, setShowAssist] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleFile = async (file: File) => {
@@ -38,6 +41,10 @@ export function ResumeUploader({ initialUrl }: { initialUrl: string | null }) {
     }
 
     setUrl(json.url)
+    if (json.suggestions && (json.suggestions.skills.length > 0 || json.suggestions.projects.length > 0)) {
+      setSuggestions(json.suggestions)
+      setShowAssist(true)
+    }
     setStatus('success')
     setTimeout(() => setStatus('idle'), 3000)
   }
@@ -104,6 +111,13 @@ export function ResumeUploader({ initialUrl }: { initialUrl: string | null }) {
             <Button variant="outline" size="sm" className="font-bold shrink-0">View</Button>
           </a>
         </div>
+      )}
+
+      {showAssist && suggestions && (
+        <ResumeAssistModal 
+          suggestions={suggestions} 
+          onClose={() => setShowAssist(false)} 
+        />
       )}
     </div>
   )
