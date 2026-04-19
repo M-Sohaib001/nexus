@@ -8,12 +8,13 @@ export default async function CompanyProfilePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return notFound()
 
-  const { data: company } = await supabase
+  const { data: company, error: companyError } = await supabase
     .from('companies')
     .select('*')
     .eq('id', user.id)
-    .single()
+    .maybeSingle()
 
+  if (companyError) console.error('QUERY_ERROR (company_profile):', companyError);
   if (!company) return notFound()
 
   return (

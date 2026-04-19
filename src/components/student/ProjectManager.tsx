@@ -60,26 +60,36 @@ export function ProjectManager({ projects }: { projects: any[] }) {
     setLoading(true)
     setMessage('')
     
-    let result;
-    if (editingProjectId) {
-      result = await updateProjectAction(editingProjectId, data)
-    } else {
-      result = await createProjectAction(data)
-    }
+    try {
+      let result;
+      if (editingProjectId) {
+        result = await updateProjectAction(editingProjectId, data)
+      } else {
+        result = await createProjectAction(data)
+      }
 
-    if (result.error) setMessage(result.error)
-    else {
-      setMessage(editingProjectId ? "Project updated successfully!" : "Project created successfully!")
-      form.reset()
-      setIsCreating(false)
-      setEditingProjectId(null)
+      if (result.error) setMessage(result.error)
+      else {
+        setMessage(editingProjectId ? "Project updated successfully!" : "Project created successfully!")
+        form.reset()
+        setIsCreating(false)
+        setEditingProjectId(null)
+      }
+    } catch (e: any) {
+      console.error(e)
+      setMessage("System error executing action.")
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this project?")) return;
-    await deleteProjectAction(id)
+    try {
+      await deleteProjectAction(id)
+    } catch (e: any) {
+      console.error(e)
+    }
   }
 
   return (

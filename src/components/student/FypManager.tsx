@@ -57,26 +57,36 @@ export function FypManager({ fyps }: { fyps: any[] }) {
     setLoading(true)
     setMessage('')
     
-    let result;
-    if (editingFypId) {
-      result = await updateFypAction(editingFypId, data)
-    } else {
-      result = await createFypAction(data)
-    }
+    try {
+      let result;
+      if (editingFypId) {
+        result = await updateFypAction(editingFypId, data)
+      } else {
+        result = await createFypAction(data)
+      }
 
-    if (result.error) setMessage(result.error)
-    else {
-      setMessage(editingFypId ? "Project updated successfully!" : "Project created successfully!")
-      form.reset()
-      setIsCreating(false)
-      setEditingFypId(null)
+      if (result.error) setMessage(result.error)
+      else {
+        setMessage(editingFypId ? "Project updated successfully!" : "Project created successfully!")
+        form.reset()
+        setIsCreating(false)
+        setEditingFypId(null)
+      }
+    } catch (e: any) {
+      console.error(e)
+      setMessage("System error executing action.")
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this project?")) return;
-    await deleteFypAction(id)
+    try {
+      await deleteFypAction(id)
+    } catch (e: any) {
+      console.error(e)
+    }
   }
 
   return (

@@ -42,12 +42,14 @@ export const getUserWithRole = cache(async () => {
   
   if (!user) return { user: null, profile: null, role: null, student: null }
 
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+  const { data: profile, error: profileError } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle()
+  if (profileError) console.error('QUERY_ERROR (profiles):', profileError);
   
   let student = null
   if (profile?.role === 'student') {
-    const { data: studentData } = await supabase.from('students').select('qr_token').eq('id', user.id).single()
-    student = studentData
+    const { data: studentData, error: studentError } = await supabase.from('students').select('qr_token').eq('id', user.id).maybeSingle()
+    if (studentError) console.error('QUERY_ERROR (students_qr):', studentError);
+    student = studentData || null
   }
 
   return { 

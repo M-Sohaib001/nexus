@@ -13,12 +13,13 @@ export default async function PublicStudentProfile({ params }: { params: Promise
   const { user, profile } = await getUserWithRole()
 
   // Fetch Student + Joined Profile Record
-  const { data: student } = await supabase
+  const { data: student, error: studentError } = await supabase
     .from('students')
     .select('*, profiles(full_name, avatar_url, created_at)')
     .eq('qr_token', resolvedParams.qr_token)
-    .single()
+    .maybeSingle()
 
+  if (studentError) console.error('QUERY_ERROR (qr_student):', studentError);
   if (!student) notFound()
 
   // Fetch FYPs explicitly bound to student
@@ -49,7 +50,7 @@ export default async function PublicStudentProfile({ params }: { params: Promise
        .from('conversations')
        .insert({ student_id: student.id, company_id: user.id })
        .select('*')
-       .single()
+       .maybeSingle()
 
      if (error?.code === '23505') { // Postgres Unique Constraint Violation resolves Racing Collisions!
         const { data: existingConv } = await supabase
@@ -57,10 +58,10 @@ export default async function PublicStudentProfile({ params }: { params: Promise
            .select('*')
            .eq('student_id', student.id)
            .eq('company_id', user.id)
-           .single()
-        conversation = existingConv
+           .maybeSingle()
+        conversation = existingConv || null
      } else {
-        conversation = newConv
+        conversation = newConv || null
      }
   }
 

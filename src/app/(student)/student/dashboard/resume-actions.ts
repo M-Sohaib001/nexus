@@ -9,7 +9,9 @@ export async function applyResumeAssistAction(data: { skills: string[], projects
   if (!user) return { error: "Unauthenticated" }
 
   // 1. Update Student Skills (Merge with existing)
-  const { data: student } = await supabase.from('students').select('skills').eq('id', user.id).single()
+  const { data: student, error: fetchError } = await supabase.from('students').select('skills').eq('id', user.id).maybeSingle()
+  if (fetchError) console.error('QUERY_ERROR (resume_skills):', fetchError);
+  
   const existingSkills = student?.skills || []
   const newSkills = Array.from(new Set([...existingSkills, ...data.skills]))
 

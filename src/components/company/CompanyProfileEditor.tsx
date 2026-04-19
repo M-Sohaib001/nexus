@@ -31,10 +31,16 @@ export function CompanyProfileEditor({ initialData }: { initialData: any }) {
   async function onSubmit(data: CompanyProfileInput) {
     setLoading(true)
     setMessage('')
-    const result = await saveCompanyProfileAction(data)
-    if (result.error) setMessage(result.error)
-    else setMessage("Company profile updated successfully!")
-    setLoading(false)
+    try {
+      const result = await saveCompanyProfileAction(data)
+      if (result.error) setMessage(result.error)
+      else setMessage("Profile updated successfully!")
+    } catch (e: any) {
+      console.error(e)
+      setMessage("System error executing action.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

@@ -36,10 +36,16 @@ export function ProfileEditor({ initialData, originUrl }: { initialData: any, or
   async function onSubmit(data: StudentProfileInput) {
     setLoading(true)
     setMessage('')
-    const result = await saveStudentProfileAction(data)
-    if (result.error) setMessage(result.error)
-    else setMessage("Profile updated successfully!")
-    setLoading(false)
+    try {
+      const result = await saveStudentProfileAction(data)
+      if (result.error) setMessage(result.error)
+      else setMessage("Profile updated successfully!")
+    } catch (e: any) {
+      console.error(e)
+      setMessage("System error executing action.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

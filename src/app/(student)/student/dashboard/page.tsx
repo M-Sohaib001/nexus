@@ -16,11 +16,24 @@ export default async function StudentDashboard() {
 
   const supabase = await createClient()
   
-  const { data: student } = await supabase
+  const { data: student, error: studentError } = await supabase
     .from('students')
     .select('*, profiles(full_name, avatar_url)')
     .eq('id', user.id)
-    .single()
+    .maybeSingle()
+
+  if (studentError) console.error('QUERY_ERROR (dashboard_student):', studentError);
+  
+  if (!student) {
+    return (
+      <div className="container mx-auto p-4 md:p-8 max-w-6xl mt-6">
+        <h1 className="system-header text-primary">STUDENT_CONTROL_PANEL</h1>
+        <div className="p-12 text-sm text-muted-foreground border border-primary/20 bg-primary/5 mt-8 font-mono text-center uppercase tracking-widest">
+          INITIALIZING MODULE...
+        </div>
+      </div>
+    )
+  }
 
   const { data: fyps } = await supabase
     .from('fyps')

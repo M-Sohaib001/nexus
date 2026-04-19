@@ -177,7 +177,13 @@ export function ExperienceManager({ experiences }: { experiences: any[] }) {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => deleteExperience(exp.id)}
+                  onClick={async () => {
+                    try {
+                      await deleteExperience(exp.id)
+                    } catch (e) {
+                      console.error(e)
+                    }
+                  }}
                   className="h-7 px-3 border-destructive/20 text-destructive text-[8px] font-black uppercase hover:bg-destructive/10 transition-all"
                 >
                   PURGE
