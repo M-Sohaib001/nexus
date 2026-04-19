@@ -98,18 +98,33 @@ export function ResumeUploader({ initialUrl }: { initialUrl: string | null }) {
       )}
 
       {/* Current resume */}
-      {url && (
-        <div className="flex items-center gap-3 p-4 bg-card border rounded-xl shadow-sm">
-          <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center border border-primary/20 shrink-0">
+      {url ? (
+        <div className="flex items-center gap-3 p-4 bg-card border rounded-xl shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
+          <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center border border-primary/20 shrink-0 shadow-[0_0_10px_rgba(239,68,68,0.1)]">
             <FileText className="w-5 h-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-sm text-foreground/90 truncate">Current Resume</p>
-            <p className="text-xs text-muted-foreground truncate">{url.split('/').pop()}</p>
+            <p className="font-bold text-sm text-foreground/90 truncate">OFFICIAL_RESUME_V2</p>
+            <p className="text-[10px] text-muted-foreground truncate font-mono uppercase tracking-tighter">
+              {url.startsWith('https://') ? 'SECURE_CLOUD_LINK' : 'INSECURE_OR_LOCAL_PATH'} // {url.split('/').pop()}
+            </p>
           </div>
-          <a href={url} target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" size="sm" className="font-bold shrink-0">View</Button>
+          <a 
+            href={url.startsWith('https://') ? url : `https://${url.replace(/^http:\/\//, '')}`} 
+            target="_blank" 
+            rel="noopener noreferrer"
+          >
+            <Button variant="outline" size="sm" className="font-black text-[10px] uppercase tracking-widest px-6 border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-all">
+              VIEW_EXTERNAL
+            </Button>
           </a>
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 p-6 border-2 border-dashed border-zinc-800 bg-zinc-900/10 rounded-xl opacity-50 grayscale transition-all duration-700">
+           <div className="w-10 h-10 border border-zinc-700 rounded-lg flex items-center justify-center shrink-0">
+             <FileText className="w-5 h-5 text-zinc-600" />
+           </div>
+           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">STATE: NO_RESUME_UPLOADED_TO_NEXUS</p>
         </div>
       )}
 
