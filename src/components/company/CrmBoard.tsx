@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { CrmConversationRow } from './CrmConversationRow'
 
 const TAG_ORDER: Record<string, number> = {
@@ -20,6 +21,39 @@ function sortConversations(data: any[]) {
 
 export function CrmBoard({ initialConversations }: { initialConversations: any[] }) {
   const [conversations, setConversations] = useState(() => sortConversations(initialConversations))
+
+  // Realtime subscription for cross-tab sync
+  useEffect(() => {
+    const supabase = createClient()
+
+    const channel = supabase
+      .channel('crm-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'conversations',
+        },
+        (payload) => {
+          const updated = payload.new as any
+          setConversations((prev) =>
+            sortConversations(
+              prev.map((c) =>
+                c.id === updated.id
+                  ? { ...c, tag: updated.tag ?? 'untagged', private_note: updated.private_note ?? c.private_note }
+                  : c
+              )
+            )
+          )
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [])
 
   const handleTagChange = useCallback((conversationId: string, newTag: string) => {
     setConversations((prev) =>
