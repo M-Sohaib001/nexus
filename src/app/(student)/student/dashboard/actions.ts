@@ -36,13 +36,13 @@ export async function createFypAction(data: any) {
 
   const { error } = await supabase
     .from('fyps')
-    .insert({
+    .upsert({
       title: result.data.title,
       summary: result.data.summary,
       description: result.data.description,
       tech_stack: result.data.tech_stack.split(',').map((s: string) => s.trim()).filter(Boolean),
       created_by: user.id
-    })
+    }, { onConflict: 'created_by' })
 
   if (error) return { error: error.message }
 

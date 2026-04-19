@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Terminal, User, Search, BarChart3, LogOut, ChevronRight, Building2 } from 'lucide-react'
+import { Menu, X, Terminal, User, Search, BarChart3, LogOut, ChevronRight, Building2, TerminalSquare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -48,6 +48,11 @@ export function Navbar({ user, profile, student }: NavbarProps) {
         icon: Building2
       }] : []),
       ...(isCompany ? [
+        {
+          label: 'R&D PROJECTS',
+          href: '/company/fyps',
+          icon: TerminalSquare
+        },
         {
           label: 'INTERACTION_LOG',
           href: '/company/crm',

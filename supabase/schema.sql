@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS public.fyps (
   summary TEXT,
   description TEXT,
   tech_stack TEXT[],
-  created_by UUID REFERENCES public.students(id) ON DELETE CASCADE NOT NULL,
+  created_by UUID REFERENCES public.students(id) ON DELETE CASCADE NOT NULL UNIQUE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 

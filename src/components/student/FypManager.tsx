@@ -83,12 +83,20 @@ export function FypManager({ fyps }: { fyps: any[] }) {
     <div className="space-y-6 pb-20">
       <div className="flex justify-between items-center px-2">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Your Projects</h2>
-          <p className="text-muted-foreground">Manage the portfolio highlighted on your public Nexus link.</p>
+          <h2 className="text-3xl font-bold tracking-tight">Your Primary Final Year Project</h2>
+          <p className="text-muted-foreground">Manage the core feature project highlighted on your public Nexus link.</p>
         </div>
-        <Button onClick={() => isCreating ? handleCancel() : setIsCreating(true)} variant={isCreating ? "secondary" : "default"}>
-          {isCreating ? 'Cancel' : <><Plus className="w-4 h-4 mr-2" /> Add Project</>}
-        </Button>
+        {!isCreating && fyps?.length === 0 ? (
+          <Button onClick={() => setIsCreating(true)} variant="default">
+            <Plus className="w-4 h-4 mr-2" /> Create FYP
+          </Button>
+        ) : !isCreating && fyps?.length >= 1 ? (
+          <Button onClick={() => handleEdit(fyps[0])} variant="secondary">
+            <Edit className="w-4 h-4 mr-2" /> Edit FYP
+          </Button>
+        ) : (
+          <Button onClick={handleCancel} variant="secondary">Cancel</Button>
+        )}
       </div>
 
       {isCreating && (
@@ -138,13 +146,14 @@ export function FypManager({ fyps }: { fyps: any[] }) {
         </Card>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-        {fyps?.length === 0 ? (
-          <div className="md:col-span-2 text-muted-foreground p-12 text-center border-2 rounded-xl border-dashed bg-muted/10">
-            <p className="text-lg">No projects added yet. Showcase your work!</p>
-          </div>
-        ) : (
-          fyps?.map((fyp) => (
+      {!isCreating && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+          {fyps?.length === 0 ? (
+            <div className="md:col-span-2 text-muted-foreground p-12 text-center border-2 rounded-xl border-dashed bg-muted/10">
+              <p className="text-lg">No primary project added yet. Showcase your thesis!</p>
+            </div>
+          ) : (
+            fyps?.map((fyp) => (
              <Card key={fyp.id} className="flex flex-col hover:border-primary/30 transition-colors bg-card hover:shadow-sm">
                <CardHeader className="flex flex-row justify-between items-start space-y-0 pb-3">
                  <CardTitle className="text-xl leading-tight font-extrabold text-foreground/90">{fyp.title}</CardTitle>
@@ -169,9 +178,10 @@ export function FypManager({ fyps }: { fyps: any[] }) {
                  </div>
                </CardContent>
              </Card>
-          ))
-        )}
-      </div>
+            ))
+          )}
+        </div>
+      )}
     </div>
   )
 }
