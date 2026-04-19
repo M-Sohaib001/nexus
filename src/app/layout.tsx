@@ -5,6 +5,7 @@ import { Navbar } from "@/components/features/Navbar";
 import { Footer } from "@/components/features/Footer";
 import { BootScreen } from "@/components/features/BootScreen";
 import { SystemLogs } from "@/components/features/SystemLogs";
+import { MotionProvider } from "@/components/providers/MotionProvider";
 import { getUserWithRole } from "@/lib/supabase/server";
 
 const geistSans = Geist({
@@ -38,7 +39,11 @@ export default async function RootLayout({
         <BootScreen />
         <SystemLogs role={profile?.role} />
         <Navbar user={user} />
-        <main className="flex-1 relative z-10">{children}</main>
+        <main className="flex-1 relative z-10">
+          <MotionProvider>
+            {children}
+          </MotionProvider>
+        </main>
         <Footer />
       </body>
     </html>
