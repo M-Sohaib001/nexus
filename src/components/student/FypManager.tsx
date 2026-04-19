@@ -67,25 +67,30 @@ export function FypManager({ fyps }: { fyps: any[] }) {
 
       if (result.error) setMessage(result.error)
       else {
-        setMessage(editingFypId ? "Project updated successfully!" : "Project created successfully!")
+        setMessage(editingFypId ? "FYP_RECORD_UPDATED" : "FYP_RECORD_CREATED")
         form.reset()
         setIsCreating(false)
         setEditingFypId(null)
       }
     } catch (e: any) {
       console.error(e)
-      setMessage("System error executing action.")
+      setMessage("SYSTEM_FAULT: ACTION_FAILED")
     } finally {
       setLoading(false)
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this project?")) return;
+    if (!window.confirm("ARE_YOU_SURE_PURGE_FYP?")) return;
+    setLoading(true)
     try {
-      await deleteFypAction(id)
+      const result = await deleteFypAction(id)
+      if (result?.error) setMessage(result.error)
     } catch (e: any) {
       console.error(e)
+      setMessage("SYSTEM_FAULT: DELETE_FAILED")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -93,61 +98,61 @@ export function FypManager({ fyps }: { fyps: any[] }) {
     <div className="space-y-6 pb-20">
       <div className="flex justify-between items-center px-2">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Your Primary Final Year Project</h2>
-          <p className="text-muted-foreground">Manage the core feature project highlighted on your public Nexus link.</p>
+          <h2 className="text-3xl font-bold tracking-tight uppercase">Your Primary Final Year Project</h2>
+          <p className="text-muted-foreground text-xs uppercase tracking-widest mt-1 opacity-60">Manage the core feature project highlighted on your public Nexus link.</p>
         </div>
         {!isCreating && fyps?.length === 0 ? (
-          <Button onClick={() => setIsCreating(true)} variant="default">
-            <Plus className="w-4 h-4 mr-2" /> Create FYP
+          <Button onClick={() => setIsCreating(true)} variant="default" className="uppercase font-black text-[10px] tracking-widest">
+            <Plus className="w-4 h-4 mr-2" /> CREATE_FYP
           </Button>
         ) : !isCreating && fyps?.length >= 1 ? (
-          <Button onClick={() => handleEdit(fyps[0])} variant="secondary">
-            <Edit className="w-4 h-4 mr-2" /> Edit FYP
+          <Button onClick={() => handleEdit(fyps[0])} variant="secondary" className="uppercase font-black text-[10px] tracking-widest">
+            <Edit className="w-4 h-4 mr-2" /> EDIT_FYP
           </Button>
         ) : (
-          <Button onClick={handleCancel} variant="secondary">Cancel</Button>
+          <Button onClick={handleCancel} variant="secondary" className="uppercase font-black text-[10px] tracking-widest">CANCEL_OP</Button>
         )}
       </div>
 
       {isCreating && (
-        <Card className="border-primary/40 shadow-md ring-1 ring-primary/20 transition-all">
+        <Card className="border-primary/40 shadow-md ring-1 ring-primary/20 transition-all rounded-none bg-primary/5">
           <CardHeader>
-            <CardTitle className="text-xl">
-              {editingFypId ? 'Edit Final Year Project' : 'New Final Year Project'}
+            <CardTitle className="text-xl uppercase font-black tracking-widest">
+              {editingFypId ? 'MODIFY_FYP_ENTRY' : 'INITIALIZE_FYP_ENTRY'}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
-                <Label>Project Title</Label>
-                <Input {...form.register('title')} placeholder="AI-based Cancer Detection System" />
-                {form.formState.errors.title && <p className="text-red-500 text-sm">{form.formState.errors.title.message}</p>}
+                <Label className="uppercase font-black text-[10px] tracking-widest">Project Title</Label>
+                <Input {...form.register('title')} placeholder="AI-based Cancer Detection System" className="rounded-none border-primary/20" />
+                {form.formState.errors.title && <p className="text-red-500 text-[10px] font-mono">{form.formState.errors.title.message}</p>}
               </div>
               <div className="space-y-2">
-                <Label>Short Summary</Label>
-                <Input {...form.register('summary')} placeholder="A two sentence summary of the project..." />
-                {form.formState.errors.summary && <p className="text-red-500 text-sm">{form.formState.errors.summary.message}</p>}
+                <Label className="uppercase font-black text-[10px] tracking-widest">Short Summary</Label>
+                <Input {...form.register('summary')} placeholder="A two sentence summary of the project..." className="rounded-none border-primary/20" />
+                {form.formState.errors.summary && <p className="text-red-500 text-[10px] font-mono">{form.formState.errors.summary.message}</p>}
               </div>
               <div className="space-y-2">
-                <Label>Full Description</Label>
-                <Textarea {...form.register('description')} rows={4} placeholder="Built a deep learning model to detect cancer from images" />
-                {form.formState.errors.description && <p className="text-red-500 text-sm">{form.formState.errors.description.message}</p>}
+                <Label className="uppercase font-black text-[10px] tracking-widest">Full Description</Label>
+                <Textarea {...form.register('description')} rows={4} placeholder="Built a deep learning model to detect cancer from images" className="rounded-none border-primary/20" />
+                {form.formState.errors.description && <p className="text-red-500 text-[10px] font-mono">{form.formState.errors.description.message}</p>}
               </div>
               <div className="space-y-2">
-                <Label>Tech Stack (Comma separated)</Label>
-                <Input {...form.register('tech_stack')} placeholder="React, Node.js, Python, PostgreSQL" />
-                {form.formState.errors.tech_stack && <p className="text-red-500 text-sm">{form.formState.errors.tech_stack.message as React.ReactNode}</p>}
+                <Label className="uppercase font-black text-[10px] tracking-widest">Tech Stack (Comma separated)</Label>
+                <Input {...form.register('tech_stack')} placeholder="React, Node.js, Python, PostgreSQL" className="rounded-none border-primary/20" />
+                {form.formState.errors.tech_stack && <p className="text-red-500 text-[10px] font-mono">{form.formState.errors.tech_stack.message as React.ReactNode}</p>}
               </div>
               
-              {message && <p className="text-sm font-medium text-green-600">{message}</p>}
+              {message && <p className="text-[10px] font-black uppercase tracking-widest text-green-500 bg-green-500/10 p-2 border border-green-500/20">{message}</p>}
               
               <div className="flex flex-col md:flex-row gap-3 mt-4">
-                <Button type="submit" disabled={loading} className="w-full md:w-auto mt-2 md:mt-0">
-                  {loading ? 'Saving...' : (editingFypId ? 'Update Project' : 'Publish Project')}
+                <Button type="submit" disabled={loading} className="w-full md:w-auto mt-2 md:mt-0 uppercase font-black text-[10px] tracking-widest">
+                  {loading ? 'SAVING...' : (editingFypId ? 'COMMIT_OVERWRITE' : 'PUBLISH_FYP')}
                 </Button>
                 {editingFypId && (
-                  <Button type="button" variant="outline" onClick={handleCancel} disabled={loading} className="w-full md:w-auto text-muted-foreground hover:text-foreground">
-                    Cancel Edit
+                  <Button type="button" variant="outline" onClick={handleCancel} disabled={loading} className="w-full md:w-auto uppercase font-black text-[10px] tracking-widest border-primary/20">
+                    ABORT_EDIT
                   </Button>
                 )}
               </div>

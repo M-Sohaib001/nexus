@@ -2,8 +2,19 @@
 
 import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
-import { FileText, UploadCloud, CheckCircle2, AlertCircle, X, Sparkles } from 'lucide-react'
+import { FileText, UploadCloud, CheckCircle2, AlertCircle, X } from 'lucide-react'
 import { ResumeAssistModal } from './ResumeAssistModal'
+
+async function saveResumeUrl(url: string): Promise<{ error?: string }> {
+  const res = await fetch('/api/save-resume-url', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url }),
+  })
+  const json = await res.json()
+  if (!res.ok) return { error: json.error ?? 'Failed to save URL' }
+  return {}
+}
 
 export function ResumeUploader({ initialUrl }: { initialUrl: string | null }) {
   const [url, setUrl] = useState<string | null>(initialUrl)
@@ -13,6 +24,8 @@ export function ResumeUploader({ initialUrl }: { initialUrl: string | null }) {
   const [suggestions, setSuggestions] = useState<any>(null)
   const [showAssist, setShowAssist] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
 
   const handleFile = async (file: File) => {
     if (file.type !== 'application/pdf') {
@@ -26,27 +39,54 @@ export function ResumeUploader({ initialUrl }: { initialUrl: string | null }) {
       return
     }
 
-    setStatus('uploading')
-    setErrorMsg('')
-    const form = new FormData()
-    form.append('file', file)
-
-    const res = await fetch('/api/upload-resume', { method: 'POST', body: form })
-    const json = await res.json()
-
-    if (!res.ok) {
-      setErrorMsg(json.error ?? 'Upload failed.')
+    if (!cloudName) {
+      setErrorMsg('UPLOAD_FAILED — Cloud storage not configured.')
       setStatus('error')
       return
     }
 
-    setUrl(json.url)
-    if (json.suggestions && (json.suggestions.skills.length > 0 || json.suggestions.projects.length > 0)) {
-      setSuggestions(json.suggestions)
-      setShowAssist(true)
+    setStatus('uploading')
+    setErrorMsg('')
+
+    try {
+      // Direct unsigned upload to Cloudinary /raw/upload endpoint
+      const form = new FormData()
+      form.append('file', file)
+      form.append('upload_preset', 'nexus_unsigned')
+      form.append('resource_type', 'raw')
+
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/raw/upload`,
+        { method: 'POST', body: form }
+      )
+      const data = await res.json()
+
+      if (!res.ok || !data.secure_url) {
+        setErrorMsg(data.error?.message ?? 'UPLOAD_FAILED — RETRY')
+        setStatus('error')
+        return
+      }
+
+      // Validate it's a raw upload URL
+      const secureUrl: string = data.secure_url
+
+      // Persist to DB via lightweight API route
+      const saveResult = await saveResumeUrl(secureUrl)
+      if (saveResult.error) {
+        setErrorMsg(`SAVE_FAILED: ${saveResult.error}`)
+        setStatus('error')
+        return
+      }
+
+      setUrl(secureUrl)
+      setStatus('success')
+      setTimeout(() => setStatus('idle'), 3000)
+
+    } catch (e: any) {
+      console.error('RESUME_UPLOAD_ERROR:', e)
+      setErrorMsg('UPLOAD_FAILED — RETRY')
+      setStatus('error')
     }
-    setStatus('success')
-    setTimeout(() => setStatus('idle'), 3000)
   }
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +117,7 @@ export function ResumeUploader({ initialUrl }: { initialUrl: string | null }) {
         <UploadCloud className={`w-10 h-10 transition-colors ${dragOver ? 'text-primary' : 'text-muted-foreground'}`} />
         <div className="text-center">
           <p className="font-bold text-foreground/80">
-            {status === 'uploading' ? 'Uploading…' : 'Drop your resume here or click to browse'}
+            {status === 'uploading' ? 'UPLOADING_RESUME...' : 'Drop your resume here or click to browse'}
           </p>
           <p className="text-xs text-muted-foreground mt-1">PDF only · Max 5MB</p>
         </div>
@@ -85,15 +125,15 @@ export function ResumeUploader({ initialUrl }: { initialUrl: string | null }) {
 
       {/* Status messages */}
       {status === 'error' && (
-        <div className="flex items-center gap-2 text-red-600 text-sm font-medium bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3">
+        <div className="flex items-center gap-2 text-red-500 text-sm font-black bg-red-500/10 border border-red-500/20 px-4 py-3 uppercase tracking-widest">
           <AlertCircle className="w-4 h-4 shrink-0" />
           {errorMsg}
           <button onClick={() => setStatus('idle')} className="ml-auto"><X className="w-4 h-4" /></button>
         </div>
       )}
       {status === 'success' && (
-        <div className="flex items-center gap-2 text-green-600 text-sm font-medium bg-green-500/10 border border-green-500/20 rounded-lg px-4 py-3">
-          <CheckCircle2 className="w-4 h-4 shrink-0" /> Resume uploaded successfully!
+        <div className="flex items-center gap-2 text-green-500 text-sm font-black bg-green-500/10 border border-green-500/20 px-4 py-3 uppercase tracking-widest">
+          <CheckCircle2 className="w-4 h-4 shrink-0" /> UPLOAD_SUCCESS — RESUME_INDEXED
         </div>
       )}
 
@@ -106,32 +146,31 @@ export function ResumeUploader({ initialUrl }: { initialUrl: string | null }) {
           <div className="flex-1 min-w-0">
             <p className="font-bold text-sm text-foreground/90 truncate">OFFICIAL_RESUME_V2</p>
             <p className="text-[10px] text-muted-foreground truncate font-mono uppercase tracking-tighter">
-              {url.startsWith('https://') ? 'SECURE_CLOUD_LINK' : 'INSECURE_OR_LOCAL_PATH'} // {url.split('/').pop()}
+              SECURE_CLOUD_LINK // {url.split('/').pop()}
             </p>
           </div>
-          <a 
-            href={url.startsWith('https://') ? url : `https://${url.replace(/^http:\/\//, '')}`} 
-            target="_blank" 
-            rel="noopener noreferrer"
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
+            className="font-black text-[10px] uppercase tracking-widest px-6 border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-all"
           >
-            <Button variant="outline" size="sm" className="font-black text-[10px] uppercase tracking-widest px-6 border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-all">
-              VIEW_EXTERNAL
-            </Button>
-          </a>
+            VIEW_RESUME
+          </Button>
         </div>
       ) : (
         <div className="flex items-center gap-3 p-6 border-2 border-dashed border-zinc-800 bg-zinc-900/10 rounded-xl opacity-50 grayscale transition-all duration-700">
-           <div className="w-10 h-10 border border-zinc-700 rounded-lg flex items-center justify-center shrink-0">
-             <FileText className="w-5 h-5 text-zinc-600" />
-           </div>
-           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">STATE: NO_RESUME_UPLOADED_TO_NEXUS</p>
+          <div className="w-10 h-10 border border-zinc-700 rounded-lg flex items-center justify-center shrink-0">
+            <FileText className="w-5 h-5 text-zinc-600" />
+          </div>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">STATE: NO_RESUME_UPLOADED_TO_NEXUS</p>
         </div>
       )}
 
       {showAssist && suggestions && (
-        <ResumeAssistModal 
-          suggestions={suggestions} 
-          onClose={() => setShowAssist(false)} 
+        <ResumeAssistModal
+          suggestions={suggestions}
+          onClose={() => setShowAssist(false)}
         />
       )}
     </div>

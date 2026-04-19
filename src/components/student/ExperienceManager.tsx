@@ -1,6 +1,7 @@
-'use client'
+"use client"
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,9 +11,14 @@ import { Plus, Trash2, Briefcase, Calendar } from 'lucide-react'
 import { createExperience, updateExperience, deleteExperience } from '@/lib/actions/experiences'
 
 export function ExperienceManager({ experiences }: { experiences: any[] }) {
+  const router = useRouter()
   const [isAdding, setIsAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set())
+
+  const visibleExperiences = experiences.filter(exp => !deletedIds.has(exp.id))
 
   const [formData, setFormData] = useState({
     title: '',
@@ -37,6 +43,7 @@ export function ExperienceManager({ experiences }: { experiences: any[] }) {
         end_date: formData.end_date || undefined
       })
       resetForm()
+      router.refresh()
     } catch (err) {
       console.error(err)
     } finally {
@@ -54,10 +61,32 @@ export function ExperienceManager({ experiences }: { experiences: any[] }) {
         end_date: formData.end_date || undefined
       })
       resetForm()
+      router.refresh()
     } catch (err) {
       console.error(err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("ARE_YOU_SURE_PURGE_RECORD?")) return
+    
+    setDeletingId(id)
+    setDeletedIds(prev => new Set(prev).add(id))
+
+    try {
+      await deleteExperience(id)
+      router.refresh()
+    } catch (e) {
+      setDeletedIds(prev => {
+        const next = new Set(prev)
+        next.delete(id)
+        return next
+      })
+      console.error(e)
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -71,6 +100,7 @@ export function ExperienceManager({ experiences }: { experiences: any[] }) {
     })
     setEditingId(exp.id)
     setIsAdding(false)
+    window.scrollTo({ top: 400, behavior: 'smooth' })
   }
 
   return (
@@ -146,7 +176,7 @@ export function ExperienceManager({ experiences }: { experiences: any[] }) {
             </div>
             <div className="flex gap-4">
               <Button type="submit" disabled={loading} className="flex-1 font-black uppercase tracking-[0.2em] text-[10px]">
-                {loading ? 'PROCESSING...' : (editingId ? 'COMMIT_UPDATE' : 'INITIALIZE_ENTRY')}
+                {loading ? 'SAVING_EXPERIENCE...' : (editingId ? 'COMMIT_UPDATE' : 'INITIALIZE_ENTRY')}
               </Button>
               <Button type="button" variant="outline" onClick={resetForm} className="border-primary/40 font-black uppercase tracking-[0.2em] text-[10px]">
                 CANCEL_OPERATION
@@ -156,14 +186,14 @@ export function ExperienceManager({ experiences }: { experiences: any[] }) {
         )}
 
         <div className="space-y-4">
-          {experiences.length === 0 && !isAdding && (
+          {visibleExperiences.length === 0 && !isAdding && (
             <div className="p-8 text-center text-muted-foreground border border-primary/20 bg-primary/5 rounded-none font-mono">
                <p className="text-[10px] font-black uppercase tracking-widest opacity-40 italic">NO_PROFESSIONAL_RECORDS_DETECTED</p>
             </div>
           )}
-          {experiences.map((exp) => (
-            <div key={exp.id} className="p-5 border border-primary/10 bg-background/50 hover:border-primary/40 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-4 group">
-              <div>
+          {visibleExperiences.map((exp) => (
+            <div key={exp.id} className="relative p-5 border border-primary/10 bg-background/50 hover:border-primary/40 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-4 group">
+              <div className={deletingId === exp.id ? 'opacity-20 transition-opacity' : ''}>
                 <h3 className="text-sm font-black text-primary uppercase tracking-tight">{exp.title}</h3>
                 <p className="text-xs text-primary/60 font-black tracking-widest uppercase">{exp.company}</p>
                 <div className="flex items-center gap-3 mt-1.5 text-[9px] text-muted-foreground font-mono uppercase">
@@ -172,19 +202,29 @@ export function ExperienceManager({ experiences }: { experiences: any[] }) {
                   <span>{exp.end_date || 'PRESENT'}</span>
                 </div>
               </div>
+
+              {deletingId === exp.id && (
+                <div className="absolute inset-0 flex items-center justify-center bg-background/40 animate-pulse">
+                  <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">PURGING...</p>
+                </div>
+              )}
+
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => startEdit(exp)} className="h-7 px-3 border-primary/20 text-[8px] font-black uppercase hover:bg-primary/10 transition-all">EDIT_LOG</Button>
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={async () => {
-                    try {
-                      await deleteExperience(exp.id)
-                    } catch (e) {
-                      console.error(e)
-                    }
-                  }}
-                  className="h-7 px-3 border-destructive/20 text-destructive text-[8px] font-black uppercase hover:bg-destructive/10 transition-all"
+                  disabled={loading || deletingId === exp.id}
+                  onClick={() => startEdit(exp)} 
+                  className="h-7 px-3 border-primary/20 text-[8px] font-black uppercase hover:bg-primary/10 transition-all disabled:opacity-50"
+                >
+                  EDIT_LOG
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  disabled={loading || deletingId === exp.id}
+                  onClick={() => handleDelete(exp.id)}
+                  className="h-7 px-3 border-destructive/20 text-destructive text-[8px] font-black uppercase hover:bg-destructive/10 transition-all disabled:opacity-50"
                 >
                   PURGE
                 </Button>
@@ -196,3 +236,4 @@ export function ExperienceManager({ experiences }: { experiences: any[] }) {
     </Card>
   )
 }
+

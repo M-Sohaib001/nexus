@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 
+const BOOT_KEY = 'nexus_booted'
+
 export function BootScreen() {
   const [complete, setComplete] = useState(false)
   const [logs, setLogs] = useState<string[]>([])
@@ -10,14 +12,17 @@ export function BootScreen() {
   const sequence = [
     "INITIALIZING NEXUS_OS v2.0.26...",
     "LOADING CORE MODULES...",
-    "ESTABLISHING SECURE SUPABASE TUNNEL...",
     "AUTH_SYSTEM: READY",
-    "REALTIME_CHANNELS: ACTIVE",
-    "SYSTEM_INTERFACE: BRUTE_LOGIC_ENGAGED",
     "BOOT_SEQUENCE_COMPLETE."
   ]
 
   useEffect(() => {
+    // Skip boot on repeat visits via localStorage
+    if (localStorage.getItem(BOOT_KEY)) {
+      setComplete(true)
+      return
+    }
+
     let current = 0
     const interval = setInterval(() => {
       if (current < sequence.length) {
@@ -25,9 +30,12 @@ export function BootScreen() {
         current++
       } else {
         clearInterval(interval)
-        setTimeout(() => setComplete(true), 500)
+        setTimeout(() => {
+          localStorage.setItem(BOOT_KEY, '1')
+          setComplete(true)
+        }, 300)
       }
-    }, 200)
+    }, 250)
 
     return () => clearInterval(interval)
   }, [])
@@ -35,7 +43,7 @@ export function BootScreen() {
   if (complete) return null
 
   return (
-    <div className="fixed inset-0 z-[999] bg-[#0B0F14] flex flex-col items-start justify-center p-8 md:p-24 font-mono text-primary animate-out duration-1000 fade-out fill-mode-forwards">
+    <div className="fixed inset-0 z-[999] bg-[#0B0F14] flex flex-col items-start justify-center p-8 md:p-24 font-mono text-primary animate-out duration-700 fade-out fill-mode-forwards">
       <div className="space-y-2 max-w-2xl">
         {logs.map((log, i) => (
           <div key={i} className={cn(

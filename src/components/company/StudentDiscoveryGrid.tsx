@@ -122,65 +122,67 @@ export function StudentDiscoveryGrid({
               const latestFyp = student.fyps?.length > 0 ? student.fyps[0] : null
 
               return (
-                <Card key={student.id} className="flex flex-col rounded-none border-primary/10 hover:border-primary/50 transition-all duration-300 bg-background shadow-none h-full overflow-hidden relative group/card">
-                  <div className="absolute top-0 right-0 p-2 bg-primary/5 border-l border-b border-primary/20 text-[8px] font-black uppercase tracking-widest text-primary/40 group-hover/card:text-primary/70 transition-colors">CANDIDATE_ID: {student.id.split('-')[0]}</div>
-                  <CardContent className="pt-8 flex-1 flex flex-col px-6">
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="w-14 h-14 rounded-none bg-primary/10 border border-primary/30 flex items-center justify-center text-xl font-black text-primary shrink-0 font-mono ring-offset-background group-hover/card:ring-2 ring-primary/20 transition-all">
-                        {profile?.full_name?.charAt(0) || 'S'}
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-black flex items-center gap-2 leading-none mb-1.5 text-primary uppercase tracking-tighter">
-                          {profile?.full_name}
-                          {student.is_ai_native_builder && (
-                            <span title="AI-Native Builder" className="text-accent hover:animate-pulse transition-all"><CheckCircle2 className="w-4 h-4 ml-0.5" /></span>
-                          )}
-                        </h3>
-                        <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{student.degree_program} // CLASS_{student.graduation_year}</p>
-                      </div>
-                    </div>
-
-                    {student.availability === 'actively_looking' && (
-                      <div className="mb-6">
-                        <span className="bg-primary/10 text-primary border border-primary/30 px-3 py-1 rounded-none text-[9px] font-black uppercase tracking-[0.2em] shadow-[0_0_15px_rgba(239,68,68,0.1)]">
-                          STATUS: ACTIVE_LOOKING
-                        </span>
-                      </div>
-                    )}
-
-                    {latestFyp ? (
-                      <div className="bg-primary/5 p-4 rounded-none border border-primary/20 relative shadow-inner flex-1">
-                        <div className="absolute -top-2 left-3 px-1.5 bg-background text-[8px] font-black uppercase tracking-widest text-primary/60">MODULE: FEATURED_PROJECT</div>
-                        <p className="font-black text-sm text-primary uppercase leading-tight tracking-tight mb-2.5">{latestFyp.title}</p>
-                        <div className="flex flex-wrap gap-1.5 mt-auto">
-                          {latestFyp.tech_stack?.slice(0, 4).map((tech: string, i: number) => (
-                            <span key={i} className="px-2 py-0.5 border border-primary/20 bg-background text-primary/80 text-[8px] font-black uppercase tracking-widest">
-                              {tech}
-                            </span>
-                          ))}
+                <Link key={student.id} href={`/student/${student.qr_token}`} target="_blank" className="block">
+                  <Card className="flex flex-col rounded-none border-primary/10 hover:border-primary/50 transition-all duration-300 bg-background shadow-none h-full overflow-hidden relative group/card cursor-pointer">
+                    <div className="absolute top-0 right-0 p-2 bg-primary/5 border-l border-b border-primary/20 text-[8px] font-black uppercase tracking-widest text-primary/40 group-hover/card:text-primary/70 transition-colors">CANDIDATE_ID: {student.id.split('-')[0]}</div>
+                    <CardContent className="pt-8 flex-1 flex flex-col px-6">
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="w-14 h-14 rounded-none bg-primary/10 border border-primary/30 flex items-center justify-center text-xl font-black text-primary shrink-0 font-mono ring-offset-background group-hover/card:ring-2 ring-primary/20 transition-all">
+                          {profile?.full_name?.charAt(0) || 'S'}
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-black flex items-center gap-2 leading-none mb-1.5 text-primary uppercase tracking-tighter">
+                            {profile?.full_name}
+                            {student.is_ai_native_builder && (
+                              <span title="AI-Native Builder" className="text-accent hover:animate-pulse transition-all"><CheckCircle2 className="w-4 h-4 ml-0.5" /></span>
+                            )}
+                          </h3>
+                          <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{student.degree_program} // CLASS_{student.graduation_year}</p>
                         </div>
                       </div>
-                    ) : (
-                      <div className="flex-1" />
-                    )}
-                  </CardContent>
-                  
-                  <CardFooter className="bg-primary/5 border-t border-primary/10 p-4 flex gap-2">
-                    <Link href={`/student/${student.qr_token}`} target="_blank" className="flex-1">
-                      <Button variant="outline" className="w-full border-primary/20 text-primary/60">ACCESS_PORTFOLIO</Button>
-                    </Link>
-                    <Button 
-                      onClick={() => handleSignal(student.id)} 
-                      disabled={isLoading}
-                      variant={isSignaled ? "default" : "outline"}
-                      className={`flex-1 border-primary/20 ${isSignaled ? 'bg-primary text-primary-foreground font-black' : 'hover:border-primary/50 text-primary font-black'}`}
-                    >
-                      {isLoading ? 'SYNC...' : (
-                        isSignaled ? 'SYSTEM_BOOKMARKED' : 'SIGNAL_INTEREST'
+
+                      {student.availability === 'actively_looking' && (
+                        <div className="mb-6">
+                          <span className="bg-primary/10 text-primary border border-primary/30 px-3 py-1 rounded-none text-[9px] font-black uppercase tracking-[0.2em] shadow-[0_0_15px_rgba(239,68,68,0.1)]">
+                            STATUS: ACTIVE_LOOKING
+                          </span>
+                        </div>
                       )}
-                    </Button>
-                  </CardFooter>
-                </Card>
+
+                      {latestFyp ? (
+                        <div className="bg-primary/5 p-4 rounded-none border border-primary/20 relative shadow-inner flex-1">
+                          <div className="absolute -top-2 left-3 px-1.5 bg-background text-[8px] font-black uppercase tracking-widest text-primary/60">MODULE: FEATURED_PROJECT</div>
+                          <p className="font-black text-sm text-primary uppercase leading-tight tracking-tight mb-2.5">{latestFyp.title}</p>
+                          <div className="flex flex-wrap gap-1.5 mt-auto">
+                            {latestFyp.tech_stack?.slice(0, 4).map((tech: string, i: number) => (
+                              <span key={i} className="px-2 py-0.5 border border-primary/20 bg-background text-primary/80 text-[8px] font-black uppercase tracking-widest">
+                                {tech}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex-1" />
+                      )}
+                    </CardContent>
+                    
+                    <CardFooter className="bg-primary/5 border-t border-primary/10 p-4 flex gap-2">
+                      <span className="flex-1 flex items-center">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-primary/40">CLICK CARD TO VIEW PORTFOLIO</span>
+                      </span>
+                      <Button 
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleSignal(student.id); }} 
+                        disabled={isLoading}
+                        variant={isSignaled ? "default" : "outline"}
+                        className={`border-primary/20 ${isSignaled ? 'bg-primary text-primary-foreground font-black' : 'hover:border-primary/50 text-primary font-black'}`}
+                      >
+                        {isLoading ? 'SYNC...' : (
+                          isSignaled ? 'BOOKMARKED' : 'SIGNAL'
+                        )}
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </Link>
               )
           })
         )}

@@ -27,7 +27,7 @@ export function CrmBoard({ initialConversations }: { initialConversations: any[]
     const supabase = createClient()
 
     const channel = supabase
-      .channel('crm-realtime')
+      .channel('conversation-updates')
       .on(
         'postgres_changes',
         {

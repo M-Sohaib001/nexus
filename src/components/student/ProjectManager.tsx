@@ -174,7 +174,7 @@ export function ProjectManager({ projects }: { projects: any[] }) {
               
               <div className="flex flex-col md:flex-row gap-3 pt-6 border-t border-primary/20">
                 <Button type="submit" disabled={loading} className="w-full md:w-auto uppercase font-black tracking-widest text-[10px] rounded-none">
-                  {loading ? 'PROCESSING...' : (editingProjectId ? 'OVERWRITE_RECORD' : 'INITIALIZE_RECORD')}
+                  {loading ? 'SAVING_PROJECT...' : (editingProjectId ? 'OVERWRITE_RECORD' : 'INITIALIZE_RECORD')}
                 </Button>
                 {editingProjectId && (
                   <Button type="button" variant="outline" onClick={handleCancel} disabled={loading} className="w-full md:w-auto uppercase font-black tracking-widest text-[10px] rounded-none border-primary/20 hover:border-primary text-primary/60 hover:text-primary transition-all">
@@ -202,12 +202,23 @@ export function ProjectManager({ projects }: { projects: any[] }) {
                    <Button variant="ghost" size="icon" onClick={() => handleEdit(project)} className="text-secondary-foreground hover:bg-primary hover:text-primary-foreground rounded-none h-8 w-8 transition-colors">
                      <Edit className="w-3.5 h-3.5" />
                    </Button>
-                   <Button variant="ghost" size="icon" onClick={() => handleDelete(project.id)} className="text-red-500 hover:bg-red-500 hover:text-white rounded-none h-8 w-8 transition-colors">
+                   <Button 
+                     variant="ghost" 
+                     size="icon" 
+                     onClick={() => handleDelete(project.id)} 
+                     disabled={deletingId === project.id}
+                     className="text-red-500 hover:bg-red-500 hover:text-white rounded-none h-8 w-8 transition-colors disabled:opacity-50"
+                   >
                      <Trash2 className="w-3.5 h-3.5" />
                    </Button>
                  </div>
                </CardHeader>
                <CardContent className="flex-1 flex flex-col pt-5">
+                 {deletingId === project.id && (
+                   <div className="absolute inset-0 bg-background/80 flex items-center justify-center z-10 animate-pulse">
+                     <p className="text-[10px] font-black text-red-500 uppercase tracking-[0.2em]">DELETING_PROJECT...</p>
+                   </div>
+                 )}
                  <p className="text-sm text-secondary-foreground mb-6 flex-1 italic">{project.description}</p>
                  
                  <div className="grid grid-cols-2 gap-2 mb-6">
