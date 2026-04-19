@@ -40,13 +40,20 @@ export const getUserWithRole = cache(async () => {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
-  if (!user) return { user: null, profile: null, role: null }
+  if (!user) return { user: null, profile: null, role: null, student: null }
 
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
   
+  let student = null
+  if (profile?.role === 'student') {
+    const { data: studentData } = await supabase.from('students').select('qr_token').eq('id', user.id).single()
+    student = studentData
+  }
+
   return { 
     user, 
     profile, 
-    role: profile?.role ?? null 
+    role: profile?.role ?? null,
+    student
   }
 })

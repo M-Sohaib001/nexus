@@ -28,7 +28,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { user, profile } = await getUserWithRole();
+  const { user, profile, student } = await getUserWithRole();
 
   return (
     <html
@@ -38,7 +38,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col bg-background selection:bg-primary/20 selection:text-primary">
         <BootScreen />
         <SystemLogs role={profile?.role} />
-        <Navbar user={user} />
+        <Navbar user={user} profile={profile} student={student} />
         <main className="flex-1 relative z-10">
           <MotionProvider>
             {children}
