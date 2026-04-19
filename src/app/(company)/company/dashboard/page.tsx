@@ -32,7 +32,16 @@ export default async function CompanyDashboard() {
         <div className="p-6 border rounded-xl bg-card shadow-sm">
            <h3 className="text-xl font-bold mb-2">Company Branding</h3>
            <p className="text-muted-foreground">Manage how standard builders perceive and engage your corporate profile.</p>
-           <Button variant="outline" className="mt-4" disabled>Edit Profile</Button>
+           <Link href="/company/profile" className="block mt-4">
+             <Button variant="outline" className="font-bold">Edit Profile</Button>
+           </Link>
+        </div>
+        <div className="p-6 border rounded-xl bg-card shadow-sm col-span-1 md:col-span-2">
+           <h3 className="text-xl font-bold mb-2">Job Postings</h3>
+           <p className="text-muted-foreground">Create job listings, manage applications, and hire the top future builders from Nexus.</p>
+           <Link href="/company/jobs" className="block mt-4">
+             <Button variant="outline" className="font-bold border-primary text-primary hover:bg-primary/10">Manage Jobs</Button>
+           </Link>
         </div>
       </div>
     </div>

@@ -2,6 +2,8 @@ import { getUserWithRole } from '@/lib/supabase/server'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 import { ProfileEditor } from '@/components/student/ProfileEditor'
 import { FypManager } from '@/components/student/FypManager'
 import { ExperienceManager } from '@/components/student/ExperienceManager'
@@ -77,9 +79,16 @@ export default async function StudentDashboard() {
 
   return (
     <div className="container mx-auto p-4 md:p-8 max-w-6xl space-y-12 mt-6">
-      <div>
-        <h1 className="system-header text-primary">STUDENT_CONTROL_PANEL</h1>
-        <p className="text-muted-foreground text-xs font-bold tracking-widest uppercase mt-1 opacity-60">Status: System_Active // Module: Profile_Manager</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 pb-4 border-b border-primary/10">
+        <div>
+          <h1 className="system-header text-primary">STUDENT_CONTROL_PANEL</h1>
+          <p className="text-muted-foreground text-xs font-bold tracking-widest uppercase mt-1 opacity-60">Status: System_Active // Module: Profile_Manager</p>
+        </div>
+        <Link href="/student/jobs">
+          <Button className="rounded-none bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-[0.2em] text-[10px] shadow-[0_0_15px_rgba(239,68,68,0.2)] px-6">
+            ACCESS_JOB_PORTAL
+          </Button>
+        </Link>
       </div>
       
       <ProfileEditor initialData={student} originUrl={originUrl} />
