@@ -42,11 +42,18 @@ export function Navbar({ user, profile, student }: NavbarProps) {
         href: '/company/discover',
         icon: Search
       },
-      ...(isStudent ? [{
-        label: 'RECRUITERS',
-        href: '/student/companies',
-        icon: Building2
-      }] : []),
+      ...(isStudent ? [
+        {
+          label: 'R&D PROJECTS',
+          href: '/student/fyps',
+          icon: TerminalSquare
+        },
+        {
+          label: 'RECRUITERS',
+          href: '/student/companies',
+          icon: Building2
+        }
+      ] : []),
       ...(isCompany ? [
         {
           label: 'R&D PROJECTS',
