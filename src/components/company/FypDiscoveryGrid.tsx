@@ -56,7 +56,7 @@ export function FypDiscoveryGrid({
   return (
     <div className="space-y-6 pb-20">
       <Card className="p-4 md:p-6 rounded-none border-primary/20 sticky top-4 z-40 bg-background/95 backdrop-blur-md shadow-[0_0_20px_rgba(239,68,68,0.05)]">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
           <div className="space-y-2">
             <Label className="system-label text-primary/70">PARAM: KEYWORD_SEARCH</Label>
             <Input 
@@ -82,6 +82,24 @@ export function FypDiscoveryGrid({
               className="w-full rounded-none border-primary/30 font-mono text-xs uppercase tracking-widest bg-background"
             />
           </div>
+
+          <div className="space-y-2 flex flex-col">
+            <Label className="system-label text-primary/70">PARAM: SORT_MATRIX</Label>
+            <div className="flex rounded-none border border-primary/30 h-10 w-full overflow-hidden">
+              <button 
+                onClick={() => handleFilterChange('sort', 'recent')}
+                className={`flex-1 text-[10px] font-black uppercase tracking-widest transition-colors ${(!searchParams.get('sort') || searchParams.get('sort') === 'recent') ? 'bg-primary/20 text-primary' : 'bg-background text-primary/40 hover:bg-primary/10'}`}
+              >
+                RECENT
+              </button>
+              <button 
+                onClick={() => handleFilterChange('sort', 'relevance')}
+                className={`flex-1 text-[10px] font-black uppercase tracking-widest border-l border-primary/30 transition-colors ${searchParams.get('sort') === 'relevance' ? 'bg-primary/20 text-primary' : 'bg-background text-primary/40 hover:bg-primary/10'}`}
+              >
+                RELEVANCE
+              </button>
+            </div>
+          </div>
         </div>
       </Card>
 
@@ -101,7 +119,11 @@ export function FypDiscoveryGrid({
               const profile = Array.isArray(student.profiles) ? student.profiles[0] : student.profiles
 
               return (
-                <Card key={fyp.id} className="flex flex-col rounded-none border-primary/10 hover:border-primary/50 transition-all duration-300 bg-background shadow-none h-full overflow-hidden relative group/card">
+                <Card 
+                  onClick={() => window.open(`/student/${student.qr_token}`, '_blank')}
+                  key={fyp.id} 
+                  className="flex flex-col rounded-none border-primary/10 hover:border-primary/50 transition-all duration-300 bg-background shadow-none h-full overflow-hidden relative group/card cursor-pointer"
+                >
                   <div className="absolute top-0 right-0 p-2 bg-primary/5 border-l border-b border-primary/20 text-[8px] font-black uppercase tracking-widest text-primary/40 group-hover/card:text-primary/70 transition-colors">PROJECT_ID: {fyp.id.split('-')[0]}</div>
                   
                   <CardContent className="pt-8 flex-1 flex flex-col px-6">
@@ -134,11 +156,11 @@ export function FypDiscoveryGrid({
                   </CardContent>
                   
                   <CardFooter className="bg-primary/5 border-t border-primary/10 p-4 flex gap-2">
-                    <Link href={`/student/${student.qr_token}`} target="_blank" className="flex-1">
+                    <Link href={`/student/${student.qr_token}`} target="_blank" className="flex-1" onClick={(e) => e.stopPropagation()}>
                       <Button variant="outline" className="w-full border-primary/20 text-primary/60 font-black text-[10px] tracking-widest uppercase rounded-none">ACCESS_PORTFOLIO</Button>
                     </Link>
                     <Button 
-                      onClick={() => handleSignal(student.id)} 
+                      onClick={(e) => { e.stopPropagation(); handleSignal(student.id); }} 
                       disabled={isLoading}
                       variant={isSignaled ? "default" : "outline"}
                       className={`flex-1 border-primary/20 text-[10px] tracking-widest uppercase rounded-none ${isSignaled ? 'bg-primary text-primary-foreground font-black' : 'hover:border-primary/50 text-primary font-black'}`}
