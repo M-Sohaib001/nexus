@@ -27,6 +27,12 @@ export default async function PublicStudentProfile({ params }: { params: Promise
     .select('*')
     .eq('created_by', student.id)
 
+  const { data: experiences } = await supabase
+    .from('experiences')
+    .select('*')
+    .eq('student_id', student.id)
+    .order('start_date', { ascending: false })
+
   const profileData = Array.isArray(student.profiles) ? student.profiles[0] : student.profiles
   const isCreator = process.env.CREATOR_QR_TOKEN && resolvedParams.qr_token === process.env.CREATOR_QR_TOKEN
 
@@ -158,6 +164,39 @@ export default async function PublicStudentProfile({ params }: { params: Promise
                  </div>
                </CardContent>
              </Card>
+          ))
+        )}
+      </div>
+
+      <div className="relative mt-12 mb-6">
+        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+          <div className="w-full border-t border-primary/20"></div>
+        </div>
+        <div className="relative flex justify-start">
+          <span className="pr-4 bg-[#0B0F14] system-label text-primary">MODULE: PROFESSIONAL_HISTORY</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {(!experiences || experiences.length === 0) ? (
+          <div className="col-span-1 md:col-span-2 p-16 text-center text-muted-foreground border border-primary/20 bg-primary/5 rounded-none font-mono">
+            <p className="text-[10px] font-black uppercase tracking-widest opacity-40 italic">NO_PROFESSIONAL_RECORDS_DETECTED</p>
+          </div>
+        ) : (
+          experiences.map((exp) => (
+            <Card key={exp.id} className="flex flex-col rounded-none border-primary/10 hover:border-primary/40 transition-all bg-primary/5 group/card relative overflow-hidden">
+               <div className="absolute top-0 right-0 p-1.5 bg-primary/10 border-l border-b border-primary/20 text-[7px] font-black uppercase tracking-widest text-primary/40">EXP_ID: {exp.id.split('-')[0]}</div>
+               <CardHeader className="pb-2 pt-6 px-6">
+                 <CardTitle className="text-md font-black text-primary uppercase tracking-tight">{exp.title}</CardTitle>
+                 <p className="text-[10px] text-primary/60 font-black uppercase tracking-widest">{exp.company}</p>
+               </CardHeader>
+               <CardContent className="flex-1 flex flex-col px-6 pb-6 pt-2">
+                 <div className="flex items-center gap-2 text-[9px] text-muted-foreground font-mono uppercase mb-4 opacity-70">
+                   <Calendar className="w-3 h-3" /> {exp.start_date} - {exp.end_date || 'PRESENT'}
+                 </div>
+                 <p className="text-[10px] text-muted-foreground uppercase tracking-widest italic opacity-60 leading-relaxed">{exp.description}</p>
+               </CardContent>
+            </Card>
           ))
         )}
       </div>

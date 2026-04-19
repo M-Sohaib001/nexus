@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { ProfileEditor } from '@/components/student/ProfileEditor'
 import { FypManager } from '@/components/student/FypManager'
+import { ExperienceManager } from '@/components/student/ExperienceManager'
 import { ResumeUploader } from '@/components/student/ResumeUploader'
 import { ResumeBuilder } from '@/components/student/ResumeBuilder'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -25,6 +26,12 @@ export default async function StudentDashboard() {
     .select('*')
     .eq('created_by', student.id)
     .order('created_at', { ascending: false })
+
+  const { data: experiences } = await supabase
+    .from('experiences')
+    .select('*')
+    .eq('student_id', user.id)
+    .order('start_date', { ascending: false })
 
   const { data: rawConversations } = await supabase
     .from('conversations_public')
@@ -59,6 +66,10 @@ export default async function StudentDashboard() {
       
       <div className="lg:col-span-8 space-y-6">
         <FypManager fyps={fyps || []} />
+        
+        <div className="border-t my-8 border-border" />
+        
+        <ExperienceManager experiences={experiences || []} />
 
         <div className="border-t my-8 border-border" />
 

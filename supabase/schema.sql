@@ -179,3 +179,25 @@ SELECT
   tag
 FROM public.conversations
 WHERE student_id = auth.uid() OR company_id = auth.uid();
+-- =====================================
+-- PHASE 15: Professional Experience
+-- =====================================
+
+CREATE TABLE IF NOT EXISTS public.experiences (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  student_id UUID REFERENCES public.students(id) ON DELETE CASCADE NOT NULL,
+  title TEXT NOT NULL,
+  company TEXT NOT NULL,
+  start_date DATE NOT NULL,
+  end_date DATE, -- NULL for "Present"
+  description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.experiences ENABLE ROW LEVEL SECURITY;
+
+CREATE INDEX IF NOT EXISTS idx_experiences_student_id ON public.experiences(student_id);
+
+CREATE POLICY "Experiences are viewable by everyone" ON public.experiences FOR SELECT USING (true);
+CREATE POLICY "Students can manage their own experiences" ON public.experiences
+  FOR ALL USING (auth.uid() = student_id) WITH CHECK (auth.uid() = student_id);
