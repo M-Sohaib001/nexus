@@ -70,6 +70,7 @@ export function ResumeUploader({ initialUrl }: { initialUrl: string | null }) {
       }
 
       const secureUrl: string = data.secure_url
+        .replace('/image/upload/', '/raw/upload/')
 
       // Persist URL to DB
       const saveResult = await saveResumeUrl(secureUrl)
