@@ -8,6 +8,7 @@ export const studentProfileSchema = z.object({
   github_url: z.string().url('Must be a valid URL').optional().or(z.literal('')).nullable(),
   availability: z.enum(['actively_looking', 'open', 'not_available']),
   is_ai_native_builder: z.boolean(),
+  skills: z.string().optional().nullable(),
 })
 
 export type StudentProfileInput = z.infer<typeof studentProfileSchema>

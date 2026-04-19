@@ -100,7 +100,7 @@ export function ExperienceManager({ experiences }: { experiences: any[] }) {
                 <Input 
                   value={formData.title}
                   onChange={e => setFormData({...formData, title: e.target.value})}
-                  placeholder="e.g. SOFTWARE_ENGINEER_INTERN"
+                  placeholder="Software Engineering Intern"
                   className="system-input"
                   required
                 />
@@ -110,7 +110,7 @@ export function ExperienceManager({ experiences }: { experiences: any[] }) {
                 <Input 
                   value={formData.company}
                   onChange={e => setFormData({...formData, company: e.target.value})}
-                  placeholder="e.g. TECH_CORP"
+                  placeholder="Systems Ltd."
                   className="system-input"
                   required
                 />
@@ -140,7 +140,7 @@ export function ExperienceManager({ experiences }: { experiences: any[] }) {
               <Textarea 
                 value={formData.description}
                 onChange={e => setFormData({...formData, description: e.target.value})}
-                placeholder="DESCRIBE_RESPONSIBILITIES..."
+                placeholder="Worked on dashboards and APIs"
                 className="system-input min-h-[100px]"
               />
             </div>

@@ -102,7 +102,7 @@ export function FypManager({ fyps }: { fyps: any[] }) {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <Label>Project Title</Label>
-                <Input {...form.register('title')} placeholder="Nexus Connect App" />
+                <Input {...form.register('title')} placeholder="AI-based Cancer Detection System" />
                 {form.formState.errors.title && <p className="text-red-500 text-sm">{form.formState.errors.title.message}</p>}
               </div>
               <div className="space-y-2">
@@ -112,7 +112,7 @@ export function FypManager({ fyps }: { fyps: any[] }) {
               </div>
               <div className="space-y-2">
                 <Label>Full Description</Label>
-                <Textarea {...form.register('description')} rows={4} placeholder="Describe the problem, solution, and outcomes..." />
+                <Textarea {...form.register('description')} rows={4} placeholder="Built a deep learning model to detect cancer from images" />
                 {form.formState.errors.description && <p className="text-red-500 text-sm">{form.formState.errors.description.message}</p>}
               </div>
               <div className="space-y-2">

@@ -60,7 +60,8 @@ CREATE TABLE IF NOT EXISTS public.students (
   availability public.student_availability DEFAULT 'open',
   is_ai_native_builder BOOLEAN DEFAULT false,
   qr_token TEXT UNIQUE NOT NULL,
-  resume_url TEXT
+  resume_url TEXT,
+  skills TEXT[]
 );
 
 -- Table: fyps

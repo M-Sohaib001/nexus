@@ -29,6 +29,7 @@ export function ProfileEditor({ initialData, originUrl }: { initialData: any, or
       github_url: initialData?.github_url || '',
       availability: initialData?.availability || 'open',
       is_ai_native_builder: initialData?.is_ai_native_builder || false,
+      skills: initialData?.skills?.join(', ') || '',
     },
   })
 
@@ -51,7 +52,7 @@ export function ProfileEditor({ initialData, originUrl }: { initialData: any, or
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Degree Program</Label>
-              <Input {...form.register('degree_program')} />
+              <Input placeholder="BS Computer Science" {...form.register('degree_program')} />
               {form.formState.errors.degree_program && <p className="text-red-500 text-sm">{form.formState.errors.degree_program.message}</p>}
             </div>
             <div className="space-y-2">
@@ -63,8 +64,14 @@ export function ProfileEditor({ initialData, originUrl }: { initialData: any, or
           
           <div className="space-y-2">
             <Label>Bio</Label>
-            <Textarea {...form.register('bio')} rows={3} />
+            <Textarea placeholder="Passionate developer interested in AI and real-world problem solving" {...form.register('bio')} rows={3} />
             {form.formState.errors.bio && <p className="text-red-500 text-sm">{form.formState.errors.bio.message}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Skills</Label>
+            <Input placeholder="React, Node.js, Python" {...form.register('skills')} />
+            <p className="text-[10px] text-muted-foreground uppercase font-bold opacity-60">Separate with commas (e.g. React, Node.js)</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

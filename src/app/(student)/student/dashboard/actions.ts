@@ -14,7 +14,10 @@ export async function saveStudentProfileAction(data: any) {
 
   const { error } = await supabase
     .from('students')
-    .update(result.data)
+    .update({
+      ...result.data,
+      skills: result.data.skills ? result.data.skills.split(',').map((s: string) => s.trim()).filter(Boolean) : []
+    })
     .eq('id', user.id)
 
   if (error) return { error: error.message }
