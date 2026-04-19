@@ -7,6 +7,7 @@ import { FypManager } from '@/components/student/FypManager'
 import { ExperienceManager } from '@/components/student/ExperienceManager'
 import { ResumeUploader } from '@/components/student/ResumeUploader'
 import { ResumeBuilder } from '@/components/student/ResumeBuilder'
+import { ProjectManager } from '@/components/student/ProjectManager'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export default async function StudentDashboard() {
@@ -32,6 +33,12 @@ export default async function StudentDashboard() {
     .select('*')
     .eq('student_id', user.id)
     .order('start_date', { ascending: false })
+
+  const { data: projects } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('student_id', user.id)
+    .order('created_at', { ascending: false })
 
   const { data: rawConversations } = await supabase
     .from('conversations_public')
@@ -66,6 +73,10 @@ export default async function StudentDashboard() {
       
       <div className="lg:col-span-8 space-y-6">
         <FypManager fyps={fyps || []} />
+        
+        <div className="border-t my-8 border-border" />
+        
+        <ProjectManager projects={projects || []} />
         
         <div className="border-t my-8 border-border" />
         

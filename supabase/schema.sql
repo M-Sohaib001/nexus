@@ -75,13 +75,27 @@ CREATE TABLE IF NOT EXISTS public.fyps (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- Table: projects
+CREATE TABLE IF NOT EXISTS public.projects (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  student_id UUID REFERENCES public.students(id) ON DELETE CASCADE NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  tech_stack TEXT[],
+  github_url TEXT,
+  live_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_students_qr_token ON public.students(qr_token);
 CREATE INDEX IF NOT EXISTS idx_fyps_created_by ON public.fyps(created_by);
+CREATE INDEX IF NOT EXISTS idx_projects_student_id ON public.projects(student_id);
 
 -- Enable RLS
 ALTER TABLE public.students ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.fyps ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
 
 
 -- =====================================
@@ -138,6 +152,12 @@ CREATE POLICY "FYPs are viewable by everyone" ON public.fyps FOR SELECT USING (t
 CREATE POLICY "Students can insert their own FYPs" ON public.fyps FOR INSERT WITH CHECK (auth.uid() = created_by);
 CREATE POLICY "Students can update their own FYPs" ON public.fyps FOR UPDATE USING (auth.uid() = created_by);
 CREATE POLICY "Students can delete their own FYPs" ON public.fyps FOR DELETE USING (auth.uid() = created_by);
+
+-- RLS Policies For Projects
+CREATE POLICY "Projects are viewable by everyone" ON public.projects FOR SELECT USING (true);
+CREATE POLICY "Students can insert their own projects" ON public.projects FOR INSERT WITH CHECK (auth.uid() = student_id);
+CREATE POLICY "Students can update their own projects" ON public.projects FOR UPDATE USING (auth.uid() = student_id);
+CREATE POLICY "Students can delete their own projects" ON public.projects FOR DELETE USING (auth.uid() = student_id);
 
 -- RLS Policies For Companies
 CREATE POLICY "Companies are viewable by everyone" ON public.companies FOR SELECT USING (true);

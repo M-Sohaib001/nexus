@@ -33,6 +33,12 @@ export default async function PublicStudentProfile({ params }: { params: Promise
     .eq('student_id', student.id)
     .order('start_date', { ascending: false })
 
+  const { data: projects } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('student_id', student.id)
+    .order('created_at', { ascending: false })
+
   const profileData = Array.isArray(student.profiles) ? student.profiles[0] : student.profiles
   const isCreator = process.env.CREATOR_QR_TOKEN && resolvedParams.qr_token === process.env.CREATOR_QR_TOKEN
 
@@ -136,7 +142,7 @@ export default async function PublicStudentProfile({ params }: { params: Promise
           <div className="w-full border-t border-primary/20"></div>
         </div>
         <div className="relative flex justify-start">
-          <span className="pr-4 bg-[#0B0F14] system-label text-primary">MODULE: PROJECT_FEED</span>
+          <span className="pr-4 bg-[#0B0F14] system-label text-primary">MODULE: FEATURED_FYP</span>
         </div>
       </div>
 
@@ -157,6 +163,54 @@ export default async function PublicStudentProfile({ params }: { params: Promise
                  <p className="text-[11px] text-muted-foreground uppercase tracking-widest mb-6 flex-1 italic opacity-60 leading-relaxed">{fyp.description}</p>
                  <div className="flex flex-wrap gap-1.5 mt-auto pt-4 border-t border-primary/10">
                    {fyp.tech_stack?.map((tech: string, i: number) => (
+                     <span key={i} className="px-2 py-0.5 border border-primary/20 bg-background text-primary/80 text-[8px] font-black uppercase tracking-widest">
+                       {tech}
+                     </span>
+                   ))}
+                 </div>
+               </CardContent>
+             </Card>
+          ))
+        )}
+      </div>
+
+      <div className="relative mt-12 mb-6">
+        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+          <div className="w-full border-t border-primary/20"></div>
+        </div>
+        <div className="relative flex justify-start">
+          <span className="pr-4 bg-[#0B0F14] system-label text-primary">MODULE: SECONDARY_PROJECTS</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {(!projects || projects.length === 0) ? (
+          <div className="col-span-1 md:col-span-2 p-16 text-center text-muted-foreground border border-primary/20 bg-primary/5 rounded-none font-mono">
+            <p className="text-[10px] font-black uppercase tracking-widest opacity-40 italic">NO_DATABANKS_FOUND</p>
+          </div>
+        ) : (
+          projects.map((project) => (
+             <Card key={project.id} className="flex flex-col rounded-none border-primary/10 hover:border-primary/40 transition-all bg-primary/5 group/card relative overflow-hidden">
+               <div className="absolute top-0 right-0 p-1.5 bg-primary/10 border-l border-b border-primary/20 text-[7px] font-black uppercase tracking-widest text-primary/40">PROJECT_ID: {project.id.split('-')[0]}</div>
+               <CardHeader className="pb-2 pt-6 px-6">
+                 <CardTitle className="text-md font-black text-primary uppercase tracking-tight">{project.title}</CardTitle>
+               </CardHeader>
+               <CardContent className="flex-1 flex flex-col px-6 pb-6 pt-0">
+                 <p className="text-[11px] text-muted-foreground uppercase tracking-widest mb-6 mt-2 flex-1 italic opacity-60 leading-relaxed">{project.description}</p>
+                 <div className="flex gap-4 mb-4">
+                   {project.github_url && (
+                     <a href={project.github_url} target="_blank" rel="noopener noreferrer" className="text-[9px] font-black uppercase tracking-widest text-primary hover:underline underline-offset-4 flex">
+                         [ REPOSITORY ]
+                     </a>
+                   )}
+                   {project.live_url && (
+                     <a href={project.live_url} target="_blank" rel="noopener noreferrer" className="text-[9px] font-black uppercase tracking-widest text-primary hover:underline underline-offset-4 flex">
+                         [ DEPLOYMENT ]
+                     </a>
+                   )}
+                 </div>
+                 <div className="flex flex-wrap gap-1.5 mt-auto pt-4 border-t border-primary/10">
+                   {project.tech_stack?.map((tech: string, i: number) => (
                      <span key={i} className="px-2 py-0.5 border border-primary/20 bg-background text-primary/80 text-[8px] font-black uppercase tracking-widest">
                        {tech}
                      </span>
