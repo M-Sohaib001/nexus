@@ -1,4 +1,0 @@
-fix: ensure Cloudinary PDF URLs use raw/upload path for correct MIME handling
-
-- Updated ResumeUploader to force /raw/upload/ path in Cloudinary URLs.
-- Ensures Google Docs Viewer and browsers treat the files as raw documents rather than images.
