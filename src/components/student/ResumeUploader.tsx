@@ -171,7 +171,7 @@ export function ResumeUploader({ initialUrl }: { initialUrl: string | null }) {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => window.open(`https://docs.google.com/viewer?url=${encodeURIComponent(url)}`, '_blank')}
+              onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
               className="font-black text-[10px] uppercase tracking-widest px-6 border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-all"
             >
               VIEW_RESUME
