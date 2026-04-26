@@ -26,8 +26,8 @@ export const projectSchema = z.object({
   title: z.string().min(3, 'Title required'),
   description: z.string().min(10, 'Description required'),
   tech_stack: z.string().min(2, 'Provide at least one tech skill'),
-  github_url: z.string().url('Must be a valid URL').optional().or(z.literal('')).nullable(),
-  live_url: z.string().url('Must be a valid URL').optional().or(z.literal('')).nullable()
+  github_url: z.union([z.string().url('Must be a valid URL'), z.literal(''), z.null()]).optional(),
+  live_url: z.union([z.string().url('Must be a valid URL'), z.literal(''), z.null()]).optional()
 })
 
 export type ProjectInput = z.infer<typeof projectSchema>

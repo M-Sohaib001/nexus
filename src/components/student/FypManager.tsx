@@ -18,6 +18,7 @@ export function FypManager({ fyps }: { fyps: any[] }) {
   const [message, setMessage] = useState('')
   const [isCreating, setIsCreating] = useState(false)
   const [editingFypId, setEditingFypId] = useState<string | null>(null)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
   const form = useForm<FypInput>({
     resolver: zodResolver(fypSchema),
@@ -81,7 +82,6 @@ export function FypManager({ fyps }: { fyps: any[] }) {
   }
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("ARE_YOU_SURE_PURGE_FYP?")) return;
     setLoading(true)
     try {
       const result = await deleteFypAction(id)
@@ -176,9 +176,24 @@ export function FypManager({ fyps }: { fyps: any[] }) {
                    <Button variant="ghost" size="icon" onClick={() => handleEdit(fyp)} className="text-primary hover:text-primary hover:bg-white rounded-md transition-all">
                      <Edit className="w-4 h-4" />
                    </Button>
-                   <Button variant="ghost" size="icon" onClick={() => handleDelete(fyp.id)} className="text-red-500 hover:text-red-600 hover:bg-white rounded-md transition-all">
-                     <Trash2 className="w-4 h-4" />
-                   </Button>
+                   {confirmDeleteId === fyp.id ? (
+                     <div className="flex items-center bg-red-500/10 border border-red-500/20 rounded-md">
+                       <Button variant="ghost" size="sm" onClick={() => {
+                         handleDelete(fyp.id)
+                         setConfirmDeleteId(null)
+                       }} className="text-red-500 hover:text-red-600 font-black text-[9px] uppercase tracking-tighter px-2">
+                         PURGE
+                       </Button>
+                       <div className="w-px h-4 bg-red-500/20" />
+                       <Button variant="ghost" size="sm" onClick={() => setConfirmDeleteId(null)} className="text-zinc-500 hover:text-white font-black text-[9px] uppercase tracking-tighter px-2">
+                         ESC
+                       </Button>
+                     </div>
+                   ) : (
+                     <Button variant="ghost" size="icon" onClick={() => setConfirmDeleteId(fyp.id)} className="text-red-500 hover:text-red-600 hover:bg-white rounded-md transition-all">
+                       <Trash2 className="w-4 h-4" />
+                     </Button>
+                   )}
                  </div>
                </CardHeader>
                <CardContent className="flex-1 flex flex-col pt-0">

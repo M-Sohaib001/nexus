@@ -20,10 +20,8 @@ export function ProjectManager({ projects }: { projects: any[] }) {
   const [message, setMessage] = useState('')
   const [isCreating, setIsCreating] = useState(false)
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null)
-  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set())
   const [deletingId, setDeletingId] = useState<string | null>(null)
-
-  const visibleProjects = projects.filter(p => !deletedIds.has(p.id))
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
   const form = useForm<ProjectInput>({
     resolver: zodResolver(projectSchema),
@@ -90,32 +88,15 @@ export function ProjectManager({ projects }: { projects: any[] }) {
   }
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this project?")) return;
-    
-    // Optimistic removal
     setDeletingId(id)
-    setDeletedIds(prev => new Set(prev).add(id))
-
     try {
       const result = await deleteProjectAction(id)
-      if (result.error) {
-        // Rollback on failure
-        setDeletedIds(prev => {
-          const next = new Set(prev)
-          next.delete(id)
-          return next
-        })
-        console.error('Delete failed:', result.error)
+      if (result?.error) {
+        setMessage(result.error)
       }
-      router.refresh()
     } catch (e: any) {
-      // Rollback on exception
-      setDeletedIds(prev => {
-        const next = new Set(prev)
-        next.delete(id)
-        return next
-      })
       console.error(e)
+      setMessage("SYSTEM_FAULT: DELETE_FAILED")
     } finally {
       setDeletingId(null)
     }
@@ -188,30 +169,54 @@ export function ProjectManager({ projects }: { projects: any[] }) {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        {(!visibleProjects || visibleProjects.length === 0) ? (
+        {(!projects || projects.length === 0) ? (
           <div className="min-h-[200px] md:col-span-2 text-primary/40 p-12 text-center border-2 rounded-none border-dashed border-primary/20 bg-primary/5 flex items-center justify-center flex-col">
             <p className="text-[10px] font-black tracking-[0.2em] uppercase italic">NO_DATABANKS_FOUND</p>
             <p className="text-[10px] mt-2 font-mono opacity-50">Upload secondary side projects for recruitment parity.</p>
           </div>
         ) : (
-          visibleProjects?.map((project) => (
+          projects.map((project) => (
              <Card key={project.id} className="flex flex-col rounded-none border-primary/20 bg-card hover:border-primary/50 transition-all shadow-none group">
                <CardHeader className="flex flex-row justify-between items-start space-y-0 pb-4 bg-primary/5 border-b border-primary/10">
                  <CardTitle className="text-lg leading-tight font-black uppercase tracking-tighter text-foreground/90">{project.title}</CardTitle>
-                 <div className="flex -mt-2 -mr-2 bg-background border border-primary/20 divide-x divide-primary/20 opacity-0 group-hover:opacity-100 transition-opacity">
-                   <Button variant="ghost" size="icon" onClick={() => handleEdit(project)} className="text-secondary-foreground hover:bg-primary hover:text-primary-foreground rounded-none h-8 w-8 transition-colors">
-                     <Edit className="w-3.5 h-3.5" />
-                   </Button>
-                   <Button 
-                     variant="ghost" 
-                     size="icon" 
-                     onClick={() => handleDelete(project.id)} 
-                     disabled={deletingId === project.id}
-                     className="text-red-500 hover:bg-red-500 hover:text-white rounded-none h-8 w-8 transition-colors disabled:opacity-50"
-                   >
-                     <Trash2 className="w-3.5 h-3.5" />
-                   </Button>
-                 </div>
+                  <div className="flex -mt-2 -mr-2 bg-background border border-primary/20 divide-x divide-primary/20 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button variant="ghost" size="icon" onClick={() => handleEdit(project)} className="text-secondary-foreground hover:bg-primary hover:text-primary-foreground rounded-none h-8 w-8 transition-colors">
+                      <Edit className="w-3.5 h-3.5" />
+                    </Button>
+                    {confirmDeleteId === project.id ? (
+                      <div className="flex items-center bg-red-500/10 border-l border-primary/20">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => {
+                            handleDelete(project.id)
+                            setConfirmDeleteId(null)
+                          }} 
+                          className="text-red-500 hover:text-red-600 font-black text-[8px] uppercase tracking-tighter px-2 h-8"
+                        >
+                          PURGE
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => setConfirmDeleteId(null)} 
+                          className="text-zinc-500 hover:text-white font-black text-[8px] uppercase tracking-tighter px-2 h-8 border-l border-primary/20"
+                        >
+                          ESC
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => setConfirmDeleteId(project.id)} 
+                        disabled={deletingId === project.id}
+                        className="text-red-500 hover:bg-red-500 hover:text-white rounded-none h-8 w-8 transition-colors disabled:opacity-50"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
+                  </div>
                </CardHeader>
                <CardContent className="flex-1 flex flex-col pt-5">
                  {deletingId === project.id && (

@@ -16,9 +16,7 @@ export function ExperienceManager({ experiences }: { experiences: any[] }) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set())
-
-  const visibleExperiences = experiences.filter(exp => !deletedIds.has(exp.id))
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
   const [formData, setFormData] = useState({
     title: '',
@@ -43,7 +41,6 @@ export function ExperienceManager({ experiences }: { experiences: any[] }) {
         end_date: formData.end_date || undefined
       })
       resetForm()
-      router.refresh()
     } catch (err) {
       console.error(err)
     } finally {
@@ -61,7 +58,6 @@ export function ExperienceManager({ experiences }: { experiences: any[] }) {
         end_date: formData.end_date || undefined
       })
       resetForm()
-      router.refresh()
     } catch (err) {
       console.error(err)
     } finally {
@@ -70,20 +66,10 @@ export function ExperienceManager({ experiences }: { experiences: any[] }) {
   }
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("ARE_YOU_SURE_PURGE_RECORD?")) return
-    
     setDeletingId(id)
-    setDeletedIds(prev => new Set(prev).add(id))
-
     try {
       await deleteExperience(id)
-      router.refresh()
     } catch (e) {
-      setDeletedIds(prev => {
-        const next = new Set(prev)
-        next.delete(id)
-        return next
-      })
       console.error(e)
     } finally {
       setDeletingId(null)
@@ -186,12 +172,12 @@ export function ExperienceManager({ experiences }: { experiences: any[] }) {
         )}
 
         <div className="space-y-4">
-          {visibleExperiences.length === 0 && !isAdding && (
+          {experiences.length === 0 && !isAdding && (
             <div className="p-8 text-center text-muted-foreground border border-primary/20 bg-primary/5 rounded-none font-mono">
                <p className="text-[10px] font-black uppercase tracking-widest opacity-40 italic">NO_PROFESSIONAL_RECORDS_DETECTED</p>
             </div>
           )}
-          {visibleExperiences.map((exp) => (
+          {experiences.map((exp) => (
             <div key={exp.id} className="relative p-5 border border-primary/10 bg-background/50 hover:border-primary/40 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-4 group">
               <div className={deletingId === exp.id ? 'opacity-20 transition-opacity' : ''}>
                 <h3 className="text-sm font-black text-primary uppercase tracking-tight">{exp.title}</h3>
@@ -219,15 +205,39 @@ export function ExperienceManager({ experiences }: { experiences: any[] }) {
                 >
                   EDIT_LOG
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  disabled={loading || deletingId === exp.id}
-                  onClick={() => handleDelete(exp.id)}
-                  className="h-7 px-3 border-destructive/20 text-destructive text-[8px] font-black uppercase hover:bg-destructive/10 transition-all disabled:opacity-50"
-                >
-                  PURGE
-                </Button>
+                {confirmDeleteId === exp.id ? (
+                  <div className="flex items-center bg-destructive/10 border border-destructive/20 ml-1">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => {
+                        handleDelete(exp.id)
+                        setConfirmDeleteId(null)
+                      }} 
+                      className="h-7 text-destructive hover:text-white hover:bg-destructive font-black text-[8px] uppercase tracking-tighter px-3"
+                    >
+                      SURE?
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => setConfirmDeleteId(null)} 
+                      className="h-7 text-zinc-500 hover:text-white font-black text-[8px] uppercase tracking-tighter px-3 border-l border-destructive/20"
+                    >
+                      CANCEL
+                    </Button>
+                  </div>
+                ) : (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    disabled={loading || deletingId === exp.id}
+                    onClick={() => setConfirmDeleteId(exp.id)}
+                    className="h-7 px-3 border-destructive/20 text-destructive text-[8px] font-black uppercase hover:bg-destructive/10 transition-all disabled:opacity-50"
+                  >
+                    PURGE
+                  </Button>
+                )}
               </div>
             </div>
           ))}
