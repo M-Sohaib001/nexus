@@ -6,6 +6,7 @@ import { Footer } from "@/components/features/Footer";
 import { BootScreen } from "@/components/features/BootScreen";
 import { SystemLogs } from "@/components/features/SystemLogs";
 import { MotionProvider } from "@/components/providers/MotionProvider";
+import QueryProvider from "@/components/providers/QueryProvider";
 import { getUserWithRole } from "@/lib/supabase/server";
 
 const geistSans = Geist({
@@ -36,15 +37,17 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
       <body className="min-h-full flex flex-col bg-background selection:bg-primary/20 selection:text-primary">
-        <BootScreen />
-        <SystemLogs role={profile?.role} />
-        <Navbar user={user} profile={profile} student={student} />
-        <main className="flex-1 relative z-10">
-          <MotionProvider>
-            {children}
-          </MotionProvider>
-        </main>
-        <Footer />
+        <QueryProvider>
+          <BootScreen />
+          <SystemLogs role={profile?.role} />
+          <Navbar user={user} profile={profile} student={student} />
+          <main className="flex-1 relative z-10">
+            <MotionProvider>
+              {children}
+            </MotionProvider>
+          </main>
+          <Footer />
+        </QueryProvider>
       </body>
     </html>
   );

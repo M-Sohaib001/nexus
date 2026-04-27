@@ -81,7 +81,7 @@ export default async function CompanyCrm() {
         </div>
         <Link href="/company/discover">
           <Button variant="outline" size="lg" className="border-primary/50 text-primary hover:bg-primary/20">
-            SCANN_FOR_TALENT
+            SCAN_FOR_TALENT
           </Button>
         </Link>
       </div>

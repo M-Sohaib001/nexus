@@ -34,7 +34,7 @@ export default async function StudentJobDetailsPage({ params }: { params: Promis
     .select('id')
     .eq('job_id', resolvedParams.id)
     .eq('student_id', user.id)
-    .single()
+    .maybeSingle()
 
   const hasApplied = !!application
   const company = job.companies
@@ -76,7 +76,7 @@ export default async function StudentJobDetailsPage({ params }: { params: Promis
             <ApplyButton 
               jobId={job.id} 
               jobTitle={job.title} 
-              companyName={company.name} 
+              companyName={company?.name ?? 'Unknown Company'} 
               hasApplied={hasApplied} 
             />
           </div>
